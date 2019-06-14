@@ -12,6 +12,7 @@ class _MyAppState extends State<MyApp> {
   final Map<String, Marker> _markers = { "one": Marker( markerId: MarkerId("one"),
                                                         position: LatLng(52.011034,4.357725),
                                                       )
+
                                        };
 
   GoogleMapController mapController;    // creating google map controler object
