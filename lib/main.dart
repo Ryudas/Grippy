@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
           onMapCreated: _onMapCreated,
           initialCameraPosition: CameraPosition(
             target: _center,
-            zoom: 11.0,
+            zoom: 15.0,
 
           ),
           markers:_markers.values.toSet(),
