@@ -19,11 +19,7 @@ class _MyAppState extends State<MyApp> {
   final Map<String, Marker> _markers = process_markers();
 
   // current user location marker
-  Marker curr_location = Marker( markerId: MarkerId("loc"),
-                                 position: LatLng(double.parse(_loc_values[0]),
-                                                  double.parse(_loc_values[1])
-                                                  )
-                         );
+  Marker curr_location;
 
 
   // stores list of subscriptions to sensor event streams (async data sources)
@@ -69,6 +65,13 @@ class _MyAppState extends State<MyApp> {
                   event.altitude.toStringAsFixed(3),
                   event.speed.toStringAsFixed(3),
                   event.timestamp.toString()];
+
+                curr_location = Marker( markerId: MarkerId("location"),
+                                        position: LatLng(double.parse(_loc_values[0]),
+                                                         double.parse(_loc_values[1])
+                                                  ),
+                                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                                );
               });
 
             })
@@ -80,6 +83,13 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+
+    // if current location is null, don't do anything
+    if(curr_location !=null)
+       _markers.addAll({"loc" : curr_location});
+
+    debugPrint(_markers.toString());
+    debugPrint(curr_location.toString());
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -93,7 +103,7 @@ class _MyAppState extends State<MyApp> {
             zoom: 15.0,
 
           ),
-          markers:_markers.values.toSet().add(value)
+          markers:_markers.values.toSet(),
         ),
       ),
     );
