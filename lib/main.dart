@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 
+
+import 'markers.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -9,11 +12,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final Map<String, Marker> _markers = { "one": Marker( markerId: MarkerId("one"),
-                                                        position: LatLng(52.011034,4.357725),
-                                                      )
-
-                                       };
+  final Map<String, Marker> _markers =
 
   GoogleMapController mapController;    // creating google map controler object
 
@@ -30,8 +29,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('strain manager'),
-          backgroundColor: Colors.teal,
+          title: Text('Strain Manager'),
+          backgroundColor: Color(0xFF0085AC),
         ),
         body: GoogleMap(
           onMapCreated: _onMapCreated,
