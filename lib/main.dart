@@ -72,6 +72,8 @@ class _MyAppState extends State<MyApp> {
                                                   ),
                                         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
                                 );
+
+                debugPrint(curr_location.toString());
               });
 
             })
@@ -85,11 +87,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
 
     // if current location is null, don't do anything
-    if(curr_location !=null)
-       _markers.addAll({"loc" : curr_location});
+    if(curr_location != null)  _markers.addAll({"loc" : curr_location});
 
     debugPrint(_markers.toString());
     debugPrint(curr_location.toString());
+
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
