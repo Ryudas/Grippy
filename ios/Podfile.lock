@@ -42,7 +42,7 @@ SPEC CHECKSUMS:
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
   geolocator: f3dd3b5b1761a15a4da00665774c5a8319e657d6
   google_api_availability: 163b30f802e6148c67f092aa4501c90ddd8eec8d
-  google_maps_flutter: 924970f41ec509a201b593548db005efb2a09ee9
+  google_maps_flutter: 78a52114c898b42ea647919679a4c58b70abe876
   GoogleMaps: 5c13302e6fe6bb6e686b267196586b91cd594225
   location_permissions: 67cfaff583afbb027a9f9248196f4b79c40f3cdc
 

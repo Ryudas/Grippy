@@ -66,14 +66,6 @@ class _MyAppState extends State<MyApp> {
                   event.speed.toStringAsFixed(3),
                   event.timestamp.toString()];
 
-                curr_location = Marker( markerId: MarkerId("location"),
-                                        position: LatLng(double.parse(_loc_values[0]),
-                                                         double.parse(_loc_values[1])
-                                                  ),
-                                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-                                );
-
-                debugPrint(curr_location.toString());
               });
 
             })
@@ -86,11 +78,21 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
 
+    if(_loc_values != null)
+    {
+        curr_location = Marker( markerId: MarkerId("location"),
+                                position: LatLng(double.parse(_loc_values[0]),
+                                                 double.parse(_loc_values[1])
+                                          ),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+      );
+    }
+
     // if current location is null, don't do anything
     if(curr_location != null)  _markers.addAll({"loc" : curr_location});
 
-    debugPrint(_markers.toString());
-    debugPrint(curr_location.toString());
+    debugPrint("Num Markers: ${_markers.length}");
+    debugPrint("Current location: ${curr_location.toString()}");
 
     return MaterialApp(
       home: Scaffold(
