@@ -1,6 +1,8 @@
 // Defines loading of markers and other related events
+import 'dart:async' show Future;
+
 import 'package:flutter/cupertino.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart'; // for google maps
 
 Map<String, Marker> process_markers()
 {
@@ -26,18 +28,23 @@ Map<String, Marker> process_markers()
 }
 
 // processes all the icons of the markers
-Map <String, BitmapDescriptor>process_icons()
+Map <String, BitmapDescriptor>process_icons() 
 {
   var temp_icons = <String, BitmapDescriptor>{};
-
-  temp_icons.addAll({ "medal": BitmapDescriptor.fromAssetImage(
-                                  ImageConfiguration(),
-
-                               ),
-
+  var temp =  AssetImage("assets/medal/icon.png");
+  temp_icons.addAll({ "medal": load_asset()
   });
 
 
   return(temp_icons);
 }
 
+// will load asset in a Bitmap descriptor
+Future<BitmapDescriptor> load_asset( String asset_name) async
+{
+    var temp = await BitmapDescriptor.fromAssetImage(ImageConfiguration(),
+                                                     "assets/$asset_name/icon.png"
+                     );
+    
+    return(temp);
+}
