@@ -16,7 +16,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
 
   // Map location markers
-  final Map<String, Marker> _markers = process_markers();
+   Map<String, Marker> _markers = <String, Marker>{};
 
   // current user location marker
   Marker curr_location;
@@ -51,6 +51,11 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState(); // must be included
 
+    process_markers(context).then((Map <String, Marker> value) {
+                              setState(() {
+                                _markers.addAll(value);
+                              });
+                            });
     // Location subscription
     var geolocator = Geolocator();
     // desired accuracy and the minimum distance change
@@ -101,15 +106,15 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Color(0xFF0085AC),
         ),
         body: GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: curr_location?.position ?? _center,
-            zoom: 15.0,
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: curr_location?.position ?? _center,
+                zoom: 15.0,
 
-          ),
-          markers:_markers.values.toSet(),
-        ),
-      ),
+              ),
+              markers:_markers.values.toSet(),
+            ),
+        )
     );
   }
 }
