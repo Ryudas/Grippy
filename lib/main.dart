@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
-
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial
 import 'markers.dart';
 
 void main() => runApp(MyApp());
@@ -19,7 +19,7 @@ class _MyAppState extends State<MyApp> {
    Map<String, Marker> _markers = <String, Marker>{};
 
   // current user location marker
-  Marker curr_location;
+  Marker _curr_location;
 
 
   // stores list of subscriptions to sensor event streams (async data sources)
@@ -34,14 +34,24 @@ class _MyAppState extends State<MyApp> {
   // timestamp time at which event was received from device
   List<String> _loc_values;
 
-  GoogleMapController mapController;    // creating google map controler object
+  // creating google map controller object
+  GoogleMapController _mapController;
+  // bluetooth state
+  BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
 
-  final LatLng _center = const LatLng(52.011578, 4.357068); // Latitude longitude
   // class , type of object that represents a position in the world
+  final LatLng _center = const LatLng(52.011578, 4.357068); // Latitude longitude
 
+  // bluetooth address
+  String _address = "_";
+
+   
+   
+   
+   
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+    _mapController = controller;
   }
 
 
@@ -50,6 +60,27 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState(); // must be included
+
+    // asynchronous calls while bluetooth is not enabled  every 200ms
+    Future.doWhile( () async {
+      if( await FlutterBluetoothSerial.instance.isEnabled) {
+        return(false);
+      }
+      await Future.delayed(Duration(milliseconds: 200));
+      return(true);
+    }).then( (_) {  // _ is a parameter argument  that we ignore
+          // Update the address field
+          FlutterBluetoothSerial.instance.address.then( (address) {
+            setState(() { _address = address; });
+          });
+       });
+
+    // Listen for further state changes
+    FlutterBluetoothSerial.instance.onStateChanged().listen((BluetoothState state) {
+      setState(() {
+        _bluetoothState = state;
+      });
+    });
 
     process_markers(context).then((Map <String, Marker> value) {
                               setState(() {
@@ -85,7 +116,7 @@ class _MyAppState extends State<MyApp> {
 
     if(_loc_values != null)
     {
-        curr_location = Marker( markerId: MarkerId("location"),
+        _curr_location = Marker( markerId: MarkerId("location"),
                                 position: LatLng(double.parse(_loc_values[0]),
                                                  double.parse(_loc_values[1])
                                           ),
@@ -94,10 +125,10 @@ class _MyAppState extends State<MyApp> {
     }
 
     // if current location is null, don't do anything
-    if(curr_location != null)  _markers.addAll({"loc" : curr_location});
+    if(_curr_location != null)  _markers.addAll({"loc" : _curr_location});
 
     debugPrint("Num Markers: ${_markers.length}");
-    debugPrint("Current location: ${curr_location.toString()}");
+    debugPrint("Current location: ${_curr_location.toString()}");
 
     return MaterialApp(
       home: Scaffold(
@@ -108,7 +139,7 @@ class _MyAppState extends State<MyApp> {
         body: GoogleMap(
               onMapCreated: _onMapCreated,
               initialCameraPosition: CameraPosition(
-                target: curr_location?.position ?? _center,
+                target: _curr_location?.position ?? _center,
                 zoom: 15.0,
 
               ),
