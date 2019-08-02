@@ -45,7 +45,8 @@ class _MyAppState extends State<MyApp> {
     mapController = controller;
   }
 
-  BitmapDescriptor raw_icon;
+  // icon for location
+  BitmapDescriptor loc_icon;
 
 
   // registering our sensor stream subscriptions
@@ -59,7 +60,7 @@ class _MyAppState extends State<MyApp> {
                                      "assets/medal/4.0x/icon.png"
     ).then( (BitmapDescriptor icon) {
         setState(() {
-          raw_icon = icon;
+          loc_icon = icon;
         });
     });
 
@@ -104,7 +105,7 @@ class _MyAppState extends State<MyApp> {
                                                  double.parse(_loc_values[1])
                                           ),
         // if icon is available, else use blue marker
-        icon:  raw_icon ??  BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+        icon:  loc_icon ??  BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       );
     }
 
