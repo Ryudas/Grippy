@@ -40,6 +40,12 @@ flutter:
   # assets used by app
   assets:
     - assets/medal/
+    - assets/fist_green/
+    - assets/fist_red/
+    - assets/fist_yellow/
+
+
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

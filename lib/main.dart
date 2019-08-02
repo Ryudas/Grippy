@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle, ByteData;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
 
@@ -34,7 +35,7 @@ class _MyAppState extends State<MyApp> {
   // timestamp time at which event was received from device
   List<String> _loc_values;
 
-  GoogleMapController mapController;    // creating google map controler object
+  GoogleMapController mapController;    // creating google map controller object
 
   final LatLng _center = const LatLng(52.011578, 4.357068); // Latitude longitude
   // class , type of object that represents a position in the world
@@ -44,12 +45,25 @@ class _MyAppState extends State<MyApp> {
     mapController = controller;
   }
 
+  BitmapDescriptor raw_icon;
+
 
   // registering our sensor stream subscriptions
   // called when stateful widget is inserted in widget tree.
   @override
   void initState() {
     super.initState(); // must be included
+
+
+    BitmapDescriptor.fromAssetImage( ImageConfiguration(bundle: rootBundle),
+                                     "assets/medal/4.0x/icon.png"
+    ).then( (BitmapDescriptor icon) {
+        setState(() {
+          raw_icon = icon;
+        });
+    });
+
+
 
     process_markers(context).then((Map <String, Marker> value) {
                               setState(() {
@@ -89,7 +103,8 @@ class _MyAppState extends State<MyApp> {
                                 position: LatLng(double.parse(_loc_values[0]),
                                                  double.parse(_loc_values[1])
                                           ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+        // if icon is available, else use blue marker
+        icon:  raw_icon ??  BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       );
     }
 
