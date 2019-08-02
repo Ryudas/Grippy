@@ -25,7 +25,6 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
                                 ),
                          "three": Marker(markerId: MarkerId("three"),
                                          position: LatLng(52.0095,4.3588),
-                                         icon: marker_icons["medal"]
                                   ),
     });
 
