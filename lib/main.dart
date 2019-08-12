@@ -46,6 +46,9 @@ class _MyAppState extends State<MyApp> {
   String _bl_adapter_address;
   String _bl_adapter_name;
 
+  // List of devices with availability
+  List<BluetoothDevice> available_devices = List<BluetoothDevice>();
+
    
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -91,6 +94,23 @@ class _MyAppState extends State<MyApp> {
       });
     });
 
+    // Adding a subscription stream for searching/updating bluetooth devices
+    _stream_subscriptions.add(
+        FlutterBluetoothSerial.instance.startDiscovery().listen( (r) {
+            setState(() {
+              Iterator i = available_devices.iterator;
+              // iterate through devices
+              while (i.moveNext()) {
+                // get current device
+                var _device = i.current;
+                if (_device.device == r.device) {
+                  _device.rssi = r.rssi;
+                }
+              }
+            });
+        })
+    );
+
 
     process_markers(context).then((Map <String, Marker> value) {
                               setState(() {
@@ -103,8 +123,7 @@ class _MyAppState extends State<MyApp> {
     // (in meters) before updates are sent to the application - 1m in our case.
     var location_options = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 1);
     _stream_subscriptions.add(
-        geolocator.getPositionStream(location_options).listen(
-                (Position event) {
+        geolocator.getPositionStream(location_options).listen((Position event) {
               setState(() {
                 _loc_values = <String>[event.latitude.toStringAsFixed(3),
                   event.longitude.toStringAsFixed(3),
