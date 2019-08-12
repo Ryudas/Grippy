@@ -185,7 +185,7 @@ class _MyAppState extends State<MyApp> {
     debugPrint("Local bluetooth adapter name: ${_bl_adapter_name}");
     debugPrint("Local bluetooth adapter name: ${_bl_adapter_address}");
 
-    debugPrint("Available paired devices: ${available_devices}");
+    debugPrint("Available paired devices: ${available_devices.toString()}");
 
     return MaterialApp(
       home: Scaffold(
@@ -205,4 +205,14 @@ class _MyAppState extends State<MyApp> {
         )
     );
   }
+
+
+  void _stop_monitoring_devices(){
+    _stream_subscriptions[0].pause();
+  }
+
+   void _start_monitoring_devices(){
+     _stream_subscriptions[0].resume();
+   }
+
 }
