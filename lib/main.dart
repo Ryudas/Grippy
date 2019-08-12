@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
   List<String> _loc_values;
 
   // creating google map controller object
-  GoogleMapController _mapController;
+  GoogleMapController _map_controller;
   // bluetooth state
   BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
 
@@ -47,12 +47,12 @@ class _MyAppState extends State<MyApp> {
   String _bl_adapter_name;
 
   // List of devices with availability
-  List<BluetoothDevice> available_devices = List<BluetoothDevice>();
+  List<BluetoothDevice> available_devices = <BluetoothDevice>[];
 
    
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
-    _mapController = controller;
+    _map_controller = controller;
   }
 
 
@@ -103,6 +103,8 @@ class _MyAppState extends State<MyApp> {
               while (i.moveNext()) {
                 // get current device
                 var _device = i.current;
+
+                // update its rssi value
                 if (_device.device == r.device) {
                   _device.rssi = r.rssi;
                 }
@@ -110,6 +112,13 @@ class _MyAppState extends State<MyApp> {
             });
         })
     );
+
+    // Setup a list of the paired devices
+    FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> paired_devices) {
+      setState(() {
+        available_devices += paired_devices;
+      });
+    });
 
 
     process_markers(context).then((Map <String, Marker> value) {
@@ -175,6 +184,8 @@ class _MyAppState extends State<MyApp> {
     debugPrint("Local bluetooth state enabled: ${_bluetoothState.isEnabled}");
     debugPrint("Local bluetooth adapter name: ${_bl_adapter_name}");
     debugPrint("Local bluetooth adapter name: ${_bl_adapter_address}");
+
+    debugPrint("Available paired devices: ${available_devices}");
 
     return MaterialApp(
       home: Scaffold(
