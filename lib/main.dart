@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
@@ -49,7 +50,14 @@ class _MyAppState extends State<MyApp> {
   // List of devices with availability
   List<BluetoothDevice> available_devices = <BluetoothDevice>[];
 
-   
+  // bluetooth serial connection
+  BluetoothConnection _bl_serial_connection;
+  // whether device is connected to serial
+  bool _is_connected_to_serial = false;
+
+  // messages buffer from an connection, with incomplete helper buffer
+  List<String> messages = <String>[];
+  String _temp_message_buffer = '';
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
     _map_controller = controller;
@@ -118,7 +126,32 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         available_devices += paired_devices;
       });
+
+      // Connection to glove
+      try {
+        available_devices.forEach( (device) {
+          // if correct device, try to connect to it
+          if(device.name == "GetAGrip") {
+            BluetoothConnection.toAddress(device.address).then((_connection) {
+              debugPrint('Connected to the device');
+              _bl_serial_connection = _connection;
+              setState(() {
+                _is_connected_to_serial = true;
+              });
+            });
+          }
+        });
+
+        _bl_serial_connection.input.listen(_on_data_received).onDone(() {
+          debugPrint('Disconnected by remote request');
+          _is_connected_to_serial = false;
+        });
+      } catch (exception) {
+        debugPrint('Cannot connect, exception occured');
+      }
     });
+
+
 
 
     process_markers(context).then((Map <String, Marker> value) {
@@ -126,6 +159,9 @@ class _MyAppState extends State<MyApp> {
                                 _markers.addAll(value);
                               });
                             });
+    
+    
+    
     // Location subscription
     var geolocator = Geolocator();
     // desired accuracy and the minimum distance change
@@ -213,6 +249,60 @@ class _MyAppState extends State<MyApp> {
 
    void _start_monitoring_devices(){
      _stream_subscriptions[0].resume();
+   }
+
+   void _on_data_received(Uint8List data) {
+     // Allocate buffer for parsed data
+     int backspacesCounter = 0;
+     data.forEach((byte) {
+       if (byte == 8 || byte == 127) {
+         backspacesCounter++;
+       }
+     });
+
+     Uint8List buffer = Uint8List(data.length - backspacesCounter);
+     int bufferIndex = buffer.length;
+
+     // Apply backspace control character
+     backspacesCounter = 0;
+     for (int i = data.length - 1; i >= 0; i--) {
+       if (data[i] == 8 || data[i] == 127) {
+         backspacesCounter++;
+       }
+       else {
+         if (backspacesCounter > 0) {
+           backspacesCounter--;
+         }
+         else {
+           buffer[--bufferIndex] = data[i];
+         }
+       }
+     }
+
+     // Create message if there is new line character
+     String dataString = String.fromCharCodes(buffer);
+     // index of endline ASCII character
+     int index = buffer.indexOf(13);
+
+     if (~index != 0) { // \r\n
+         messages.add(
+             //  are there backspaces, then buffer is a substring
+             (backspacesCounter > 0 )?
+                 _temp_message_buffer.substring(0, _temp_message_buffer.length - backspacesCounter)
+                 : _temp_message_buffer + dataString.substring(0, index)
+         );
+         _temp_message_buffer = dataString.substring(index);
+     }
+     else {
+       _temp_message_buffer = (
+           backspacesCounter > 0
+               ? _temp_message_buffer.substring(0, _temp_message_buffer.length - backspacesCounter)
+               : _temp_message_buffer
+               + dataString
+       );
+     }
+
+     debugPrint("${messages}");
    }
 
 }
