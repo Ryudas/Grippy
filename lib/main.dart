@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart' as prefix0;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial
@@ -51,6 +50,8 @@ class _MyAppState extends State<MyApp> {
 
   // List of devices with availability
   List<BluetoothDevice> available_devices = <BluetoothDevice>[];
+  // Rssi of connected device
+   int _connected_device_rssi;
 
   // bluetooth serial connection
   BluetoothConnection _bl_serial_connection;
@@ -114,8 +115,8 @@ class _MyAppState extends State<MyApp> {
                 // get current device
                 BluetoothDevice device = i.current;
                 // update its rssi value
-                if (device. == response.device) {
-                  device = r.rssi;
+                if (device.name == response.device.name) {
+                  _connected_device_rssi = response.rssi;
                 }
               }
             });
@@ -208,6 +209,7 @@ class _MyAppState extends State<MyApp> {
     // if current location is null, don't do anything
     if(_curr_location != null)  _markers.addAll({"loc" : _curr_location});
 
+    /* Prints for debug
     debugPrint("Num Markers: ${_markers.length}");
     debugPrint("Current location: ${_curr_location.toString()}");
 
@@ -216,6 +218,8 @@ class _MyAppState extends State<MyApp> {
     debugPrint("Local bluetooth adapter name: ${_bl_adapter_address}");
 
     debugPrint("Available paired devices: ${available_devices[0].toString()}");
+    */
+
 
     return MaterialApp(
       home: Scaffold(
