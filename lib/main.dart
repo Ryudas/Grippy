@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart' as prefix0;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial
@@ -104,53 +106,45 @@ class _MyAppState extends State<MyApp> {
 
     // Adding a subscription stream for searching/updating bluetooth devices
     _stream_subscriptions.add(
-        FlutterBluetoothSerial.instance.startDiscovery().listen( (r) {
+        FlutterBluetoothSerial.instance.startDiscovery().listen( (response) {
             setState(() {
               Iterator i = available_devices.iterator;
               // iterate through devices
               while (i.moveNext()) {
                 // get current device
-                var _device = i.current;
-
+                BluetoothDevice device = i.current;
                 // update its rssi value
-                if (_device.device == r.device) {
-                  _device.rssi = r.rssi;
+                if (device. == response.device) {
+                  device = r.rssi;
                 }
               }
             });
         })
     );
 
+
+
+
     // Setup a list of the paired devices
     FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> paired_devices) {
-      setState(() {
         available_devices += paired_devices;
-      });
-
-      // Connection to glove
-      try {
-        available_devices.forEach( (device) {
-          // if correct device, try to connect to it
-          if(device.name == "GetAGrip") {
-            BluetoothConnection.toAddress(device.address).then((_connection) {
-              debugPrint('Connected to the device');
-              _bl_serial_connection = _connection;
-              setState(() {
-                _is_connected_to_serial = true;
-              });
-            });
-          }
-        });
-
-        _bl_serial_connection.input.listen(_on_data_received).onDone(() {
-          debugPrint('Disconnected by remote request');
-          _is_connected_to_serial = false;
-        });
-      } catch (exception) {
-        debugPrint('Cannot connect, exception occured');
-      }
     });
 
+    // bluetooth connection to glove address
+     BluetoothConnection.toAddress("00:0E:0E:0D:77:2B").then((_connection) {
+            debugPrint('Connected to the device');
+            _bl_serial_connection = _connection;
+            setState(() {
+              _is_connected_to_serial = true;
+            });
+
+
+            _bl_serial_connection.input.listen(_on_data_received).onDone(() {
+              debugPrint('Disconnected by remote request');
+              _is_connected_to_serial = false;
+            });
+
+     });
 
 
 
@@ -221,7 +215,7 @@ class _MyAppState extends State<MyApp> {
     debugPrint("Local bluetooth adapter name: ${_bl_adapter_name}");
     debugPrint("Local bluetooth adapter name: ${_bl_adapter_address}");
 
-    debugPrint("Available paired devices: ${available_devices.toString()}");
+    debugPrint("Available paired devices: ${available_devices[0].toString()}");
 
     return MaterialApp(
       home: Scaffold(
@@ -303,6 +297,17 @@ class _MyAppState extends State<MyApp> {
      }
 
      debugPrint("${messages}");
+   }
+
+   // sends message through bluetooth connection
+   void _sendMessage(String text) {
+     // remove leading and trailing spaces
+     text = text.trim();
+
+     if (text.isNotEmpty)  {
+       _bl_serial_connection.output.add(utf8.encode(text + "\r\n"));
+     }
+
    }
 
 }
