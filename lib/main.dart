@@ -146,6 +146,11 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
     // requests disabling of pairing mode
     FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
+
+    // unsubscribe from open streams to prevent memory leaks
+    for (StreamSubscription<dynamic> subscription in _stream_subscriptions) {
+      subscription?.cancel();
+    }
    }
 
   @override
