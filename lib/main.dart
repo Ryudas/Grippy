@@ -42,12 +42,10 @@ class _MyAppState extends State<MyApp> {
   // class , type of object that represents a position in the world
   final LatLng _center = const LatLng(52.011578, 4.357068); // Latitude longitude
 
-  // bluetooth address
-  String _address = "_";
+  // bluetooth address and name
+  String _bl_adapter_address;
+  String _bl_adapter_name;
 
-   
-   
-   
    
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -61,6 +59,11 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState(); // must be included
 
+
+    // Get current state
+    FlutterBluetoothSerial.instance.state.then((state) {
+      setState(() { _bluetoothState = state; });
+    });
     // asynchronous calls while bluetooth is not enabled  every 200ms
     Future.doWhile( () async {
       if( await FlutterBluetoothSerial.instance.isEnabled) {
@@ -71,16 +74,23 @@ class _MyAppState extends State<MyApp> {
     }).then( (_) {  // _ is a parameter argument  that we ignore
           // Update the address field
           FlutterBluetoothSerial.instance.address.then( (address) {
-            setState(() { _address = address; });
+            setState(() { _bl_adapter_address = address; });
           });
        });
 
-    // Listen for further state changes
+    // listen when bluetooth instance has a name
+    FlutterBluetoothSerial.instance.name.then((name) {
+      setState(() { _bl_adapter_name = name; });
+    });
+
+
+    // Listen for further state changes to bluetooth adapter
     FlutterBluetoothSerial.instance.onStateChanged().listen((BluetoothState state) {
       setState(() {
         _bluetoothState = state;
       });
     });
+
 
     process_markers(context).then((Map <String, Marker> value) {
                               setState(() {
@@ -111,6 +121,14 @@ class _MyAppState extends State<MyApp> {
 
   }
 
+  // disposal measures at the end of app
+   @override
+   void dispose(){
+    super.dispose();
+    // requests disabling of pairing mode
+    FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
+   }
+
   @override
   Widget build(BuildContext context) {
 
@@ -129,6 +147,10 @@ class _MyAppState extends State<MyApp> {
 
     debugPrint("Num Markers: ${_markers.length}");
     debugPrint("Current location: ${_curr_location.toString()}");
+
+    debugPrint("Local bluetooth state enabled: ${_bluetoothState.isEnabled}");
+    debugPrint("Local bluetooth adapter name: ${_bl_adapter_name}");
+    debugPrint("Local bluetooth adapter name: ${_bl_adapter_address}");
 
     return MaterialApp(
       home: Scaffold(
