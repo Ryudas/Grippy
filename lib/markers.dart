@@ -1,11 +1,12 @@
 // Defines loading of markers and other related events
 import 'dart:async' show Future;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // for google maps
 import 'package:flutter/services.dart' show rootBundle;
 
+
+// function to process markers given locations in json file
 Future<Map<String, Marker>> process_markers(BuildContext context) async
 {
     // map temporary markers
@@ -30,8 +31,7 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
                          "three": Marker(markerId: MarkerId("three"),
                                          position: LatLng(52.0095,4.3588),
                                          icon: marker_icons["fist_yellow"],
-
-                                  ),
+                                ),
     });
 
     return(temp_marker);
