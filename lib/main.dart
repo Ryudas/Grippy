@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial library
+import 'package:path_provider/path_provider.dart';  // library for indirect filesystem access
+
 import 'markers.dart';
 
 void main() => runApp(MyApp());
@@ -54,7 +57,7 @@ class _MyAppState extends State<MyApp> {
   // List of devices with availability
   List<BluetoothDevice> available_devices = <BluetoothDevice>[];
   // Rssi of connected device
-   int _connected_device_rssi;
+  int _connected_device_rssi;
 
   // bluetooth serial connection
   BluetoothConnection _bl_serial_connection;
@@ -242,13 +245,15 @@ class _MyAppState extends State<MyApp> {
           title: Text('Strain Manager'),
           backgroundColor: Color(0xFF0085AC),
           // in case we have recording, adding a record button
-          leading:
-          Visibility(
+          leading: Visibility(
             // doing this so I can get largest size possible for icon
             child:  LayoutBuilder(builder: (context, constraint) {
-              return Icon(Icons.adjust,size: constraint.biggest.height *.85, color: Colors.red);
+              return Icon(Icons.adjust,size: constraint.biggest.height *.75, color: Colors.redAccent);
             }),
             visible: _is_connected_to_serial,
+            replacement: LayoutBuilder(builder: (context, constraint) {
+              return Icon(Icons.adjust,size: constraint.biggest.height *.75, color: Colors.grey);
+            }),
           ),
         ),
         body: GoogleMap(
@@ -336,6 +341,18 @@ class _MyAppState extends State<MyApp> {
        _bl_serial_connection.output.add(utf8.encode(text + "\r\n"));
      }
 
+   }
+
+   // Gets path of Documents directory for app
+   Future<String> get _localPath async {
+     final directory = await getApplicationDocumentsDirectory();
+
+     return directory.path;
+   }
+
+   Future<File> get _localFile async {
+     final path = await _localPath;
+     return File('$path/LOG.txt');
    }
 
 }
