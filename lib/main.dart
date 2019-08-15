@@ -70,6 +70,7 @@ class _MyAppState extends State<MyApp> {
   // messages buffer from an connection, with incomplete helper buffer
   List<String> messages = <String>[];
   String _temp_message_buffer = '';
+
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
     _map_controller = controller;
@@ -151,7 +152,11 @@ class _MyAppState extends State<MyApp> {
         available_devices += paired_devices;
     });
 
-    // bluetooth connection to glove address
+
+    _connect_to_device();
+
+/*
+   // bluetooth connection to glove address
      BluetoothConnection.toAddress("00:0E:0E:0D:77:2B").then((_connection) {
             debugPrint('Connected to the device');
             _bl_serial_connection = _connection;
@@ -165,7 +170,8 @@ class _MyAppState extends State<MyApp> {
               _is_connected_to_serial = false;
             });
 
-     });
+     })
+ ;*/
 
 
     process_markers(context).then((Map <String, Marker> value) {
@@ -272,7 +278,7 @@ class _MyAppState extends State<MyApp> {
   }
 
 
-  void _stop_monitoring_devices(){
+   void _stop_monitoring_devices(){
     _stream_subscriptions[0].pause();
   }
 
@@ -320,7 +326,7 @@ class _MyAppState extends State<MyApp> {
                  _temp_message_buffer.substring(0, _temp_message_buffer.length - backspacesCounter)
                  : _temp_message_buffer + dataString.substring(0, index)
          );
-         _temp_message_buffer = dataString.substring(index);
+         _temp_message_buffer = dataString.substring(index).trim();
      }
      else {
        _temp_message_buffer = (
@@ -331,6 +337,7 @@ class _MyAppState extends State<MyApp> {
        );
      }
 
+    debugPrint(_temp_message_buffer);
 /*
      // store messages
      widget.storage.write_data(messages[0]).then( (File my_file){
@@ -352,7 +359,28 @@ class _MyAppState extends State<MyApp> {
 
    }
 
+   void _connect_to_device(){
+     // bluetooth connection to glove address
+     BluetoothConnection.toAddress("00:0E:0E:0D:77:2B").then((_connection) {
+       debugPrint('Connected to the device');
+       _bl_serial_connection = _connection;
 
+       setState(() {
+         _is_connected_to_serial = true;
+       });
+
+
+       _bl_serial_connection.input.listen(_on_data_received).onDone(() {
+         debugPrint('Disconnected by remote request');
+         _bl_serial_connection.finish();
+         setState(() {
+           _is_connected_to_serial = false;
+         });
+
+
+       });
+     });
+   }
 
 }
 
