@@ -59,13 +59,15 @@ class _MyAppState extends State<MyApp> {
 
   // List of devices with availability
   List<BluetoothDevice> available_devices = <BluetoothDevice>[];
-  // Rssi of connected device
-  int _connected_device_rssi;
+  // Rssi of desired device
+  int _desired_device_rssi;
 
   // bluetooth serial connection
   BluetoothConnection _bl_serial_connection;
   // whether device is connected to serial
   bool _is_connected_to_serial = false;
+  // if bluetooth discovering is active (starts active)
+  bool _is_discovering = true;
 
   // messages buffer from an connection, with incomplete helper buffer
   List<String> messages = <String>[];
@@ -126,53 +128,15 @@ class _MyAppState extends State<MyApp> {
       });
     });
 
-    // Adding a subscription stream for searching/updating bluetooth devices
-    _stream_subscriptions.add(
-        FlutterBluetoothSerial.instance.startDiscovery().listen( (response) {
-            setState(() {
-              Iterator i = available_devices.iterator;
-              // iterate through devices
-              while (i.moveNext()) {
-                // get current device
-                BluetoothDevice device = i.current;
-                // update its rssi value
-                if (device.name == response.device.name) {
-                  _connected_device_rssi = response.rssi;
-                }
-              }
-            });
-        })
-    );
-
-
-
+    if(_is_discovering){
+      _start_discovering_devices();
+    }
 
     // Setup a list of the paired devices
     FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> paired_devices) {
         available_devices += paired_devices;
+        _connect_to_device(available_devices[0].address);
     });
-
-
-    _connect_to_device();
-
-/*
-   // bluetooth connection to glove address
-     BluetoothConnection.toAddress("00:0E:0E:0D:77:2B").then((_connection) {
-            debugPrint('Connected to the device');
-            _bl_serial_connection = _connection;
-            setState(() {
-              _is_connected_to_serial = true;
-            });
-
-
-            _bl_serial_connection.input.listen(_on_data_received).onDone(() {
-              debugPrint('Disconnected by remote request');
-              _is_connected_to_serial = false;
-            });
-
-     })
- ;*/
-
 
     process_markers(context).then((Map <String, Marker> value) {
                               setState(() {
@@ -220,6 +184,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+
+    if(_is_discovering){
+      _start_discovering_devices();
+    }
 
     if(_loc_values != null)
     {
@@ -337,7 +305,6 @@ class _MyAppState extends State<MyApp> {
        );
      }
 
-    debugPrint(_temp_message_buffer);
 /*
      // store messages
      widget.storage.write_data(messages[0]).then( (File my_file){
@@ -345,7 +312,7 @@ class _MyAppState extends State<MyApp> {
      });
 */
 
-     debugPrint("${messages}");
+     debugPrint("${messages.last}");
    }
 
    // sends message through bluetooth connection
@@ -359,9 +326,10 @@ class _MyAppState extends State<MyApp> {
 
    }
 
-   void _connect_to_device(){
+   // connect to bluetooth device given its address
+   void _connect_to_device(String address){
      // bluetooth connection to glove address
-     BluetoothConnection.toAddress("00:0E:0E:0D:77:2B").then((_connection) {
+     BluetoothConnection.toAddress(address).then((_connection) {
        debugPrint('Connected to the device');
        _bl_serial_connection = _connection;
 
@@ -374,7 +342,10 @@ class _MyAppState extends State<MyApp> {
          debugPrint('Disconnected by remote request');
          _bl_serial_connection.finish();
          setState(() {
+           // not connected anymore
            _is_connected_to_serial = false;
+           // try to find device
+           _is_discovering = true;
          });
 
 
@@ -382,6 +353,33 @@ class _MyAppState extends State<MyApp> {
      });
    }
 
+   // Starts discovering available bluetooth devices
+   void _start_discovering_devices(){
+     // Adding a subscription stream for searching/updating bluetooth devices
+     _stream_subscriptions.add(
+         FlutterBluetoothSerial.instance.startDiscovery().listen( (response) {
+           setState(() {
+             Iterator i = available_devices.iterator;
+             // iterate through devices
+             while (i.moveNext()) {
+               // get current device
+               BluetoothDevice device = i.current;
+               var name = (response.device).name;
+               // update its rssi value
+               if (device == response.device) {
+                 _desired_device_rssi = response.rssi;
+               }
+             }
+           });
+         })
+     );
+
+     // CAREFUL HERE, using last....
+     _stream_subscriptions.last.onDone(() {
+        _is_discovering = false;
+     });
+
+   }
 }
 
 
