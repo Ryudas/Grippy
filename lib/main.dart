@@ -79,6 +79,9 @@ class _MyAppState extends State<MyApp> {
   // icon for location
   BitmapDescriptor loc_icon;
 
+  // activity running average object
+  ActivityRunningAvg running_avg = ActivityRunningAvg(5);
+
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
     _map_controller = controller;
@@ -433,7 +436,27 @@ class _MyAppState extends State<MyApp> {
     
     // parse glove data into prepared object
     var glove_data = GloveData(data);
+    running_avg.add_data_pt(glove_data.steps);
 
+
+    // process inactivity
+    if(running_avg.get_inactivity(50)){
+      // do inactivity actions
+    }
+
+    // process stress
+    if( glove_data.heart_rate < 100){
+      // normal
+    } else if (glove_data.heart_rate < 130){ // mid to high
+      // mid
+    } else{
+      // high warning!
+    }
+
+    // process challenge
+    if(glove_data.challenge){
+      // send data
+    }
 
   }
 
@@ -515,6 +538,7 @@ class ActivityRunningAvg{
     }
     
     // by default return false
+    return(false);
   }
 
   void add_data_pt( int steps){
