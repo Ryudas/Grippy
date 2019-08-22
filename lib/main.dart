@@ -7,6 +7,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial library
+import 'package:path_provider/path_provider.dart';
 
 
 import 'markers.dart';
@@ -320,6 +321,10 @@ class _MyAppState extends State<MyApp> {
                  : _temp_message_buffer + dataString.substring(0, index)
          );
          _temp_message_buffer = dataString.substring(index).trim();
+
+         // handle most current message data
+         handle_glove_data(messages.last);
+
      }
      else {
        _temp_message_buffer = (
@@ -420,7 +425,65 @@ class _MyAppState extends State<MyApp> {
 
    }
 
+   void handle_glove_data(String data)
+  {
+
+    // log incoming raw string glove data
+    widget.storage.write_data(data);
+    
+    // parse glove data into prepared object
+    var glove_data = GloveData(data);
+
+
+  }
+
+
+
+
 }
 
+class GloveData
+{
+  //default constructor
+  GloveData(String data){
+    // remove endlines
+    var temp_str = data.trim();
+    // split into comma separated strings and process these
+    temp_str.split(",").forEach(( String value) {
+
+      // get first character, the identifier
+      // and assign members
+      switch(value[0])
+      {
+        case "T": { this.timestamp = int.parse(value.substring(1)); }
+        break;
+
+        case "H": { this.heart_rate = int.parse(value.substring(1));}
+        break;
+
+        case "S": { this.steps =int.parse(value.substring(1)); }
+        break;
+
+        case "C": { this.challenge = bool.fromEnvironment(value.substring(1)); }
+        break;
+
+        default: { }
+        break;
+      }
+
+      
+
+    });
+
+
+  }
+
+  int timestamp;
+  int heart_rate;
+  int steps;
+  bool challenge;
+
+
+}
 
 
