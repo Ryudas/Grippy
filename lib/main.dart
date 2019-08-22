@@ -180,14 +180,19 @@ class _MyAppState extends State<MyApp> {
 
   }
 
-  // disposal measures at the end of app
+  // disposal measures at the end of widget
   @override
   void dispose(){
     super.dispose();
-    // requests disabling of pairing mode
-    FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
 
-    _bl_serial_connection?.dispose();
+    if(_bl_serial_connection.isConnected && _bl_serial_connection != null) {
+      //  Avoid memory leak (`setState` after dispose) and disconnect
+      _bl_serial_connection?.dispose();
+      _bl_serial_connection = null;
+
+      debugPrint("Disconnecting locally.");
+    }
+
     // unsubscribe from open streams to prevent memory leaks
     for (StreamSubscription<dynamic> subscription in _stream_subscriptions) {
       subscription?.cancel();
