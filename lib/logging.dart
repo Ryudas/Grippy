@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';  // library for indirect file
 class DataStorage{
   // Gets path of Documents directory for app
   Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getExternalStorageDirectory();
 
     return directory.path;
   }

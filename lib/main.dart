@@ -12,7 +12,8 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // blue
 import 'markers.dart';
 import 'logging.dart';
 
-// run my app, while creating a DataStorage object
+// logging only works for Android
+// run my app, while creating a DataStorage object for logging
 void main() => runApp(MyApp(storage: DataStorage()));
 
 class MyApp extends StatefulWidget {
@@ -88,6 +89,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState(); // must be included
+
+    widget.storage.write_data("TESTING");
 
 
     BitmapDescriptor.fromAssetImage( ImageConfiguration(bundle: rootBundle),
