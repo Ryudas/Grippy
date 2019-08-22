@@ -14,7 +14,20 @@ import 'logging.dart';
 
 // logging only works for Android
 // run my app, while creating a DataStorage object for logging
-void main() => runApp(MyApp(storage: DataStorage()));
+void main(){
+  runApp( MaterialApp(
+      onGenerateRoute: (RouteSettings settings) {
+        if (settings.name == '/') {
+          return new MaterialPageRoute<Null>(
+            settings: settings,
+            builder: (_) => MyApp(storage: DataStorage()),
+            maintainState: false,
+          );
+        }
+        return null;
+      }
+  ));
+}
 
 class MyApp extends StatefulWidget {
   MyApp({Key key, @required this.storage}) : super(key: key);
@@ -24,7 +37,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // Map location markers
    Map<String, Marker> _markers = <String, Marker>{};
@@ -87,11 +100,32 @@ class _MyAppState extends State<MyApp> {
   }
 
 
+  // monitor app lyfecycle state 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch(state) {
+      case AppLifecycleState.resumed:
+      // Handle this case
+        break;
+      case AppLifecycleState.inactive:
+      // Handle this case
+        break;
+      case AppLifecycleState.paused:
+      // Handle this case
+        break;
+      case AppLifecycleState.suspending:
+      // Handle this case
+        break;
+    }
+  }
+
   // registering our sensor stream subscriptions
   // called when stateful widget is inserted in widget tree.
   @override
   void initState() {
     super.initState(); // must be included
+    // must be included
+    WidgetsBinding.instance.addObserver(this);
 
     widget.storage.write_data("TESTING");
 
@@ -183,6 +217,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose(){
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
 
     if(_bl_serial_connection.isConnected && _bl_serial_connection != null) {
       //  Avoid memory leak (`setState` after dispose) and disconnect
@@ -203,7 +238,14 @@ class _MyAppState extends State<MyApp> {
     super.deactivate();
     // deactivate connection
 
-    _bl_serial_connection?.dispose();
+    if(_bl_serial_connection.isConnected && _bl_serial_connection != null) {
+      //  Avoid memory leak (`setState` after dispose) and disconnect
+      _bl_serial_connection?.dispose();
+      _bl_serial_connection = null;
+
+      debugPrint("Disconnecting locally.");
+    }
+
     setState(() {
       // not connected anymore
       _is_connected_to_serial = false;
