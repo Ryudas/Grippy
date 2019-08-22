@@ -7,7 +7,6 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial library
-import 'package:path_provider/path_provider.dart';
 
 
 import 'markers.dart';
@@ -405,7 +404,6 @@ class _MyAppState extends State<MyApp> {
              while (i.moveNext()) {
                // get current device
                BluetoothDevice device = i.current;
-               var name = (response.device).name;
                // update its rssi value
                if (device == response.device) {
                  _desired_device_rssi = response.rssi;
