@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -8,10 +7,12 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial library
-import 'package:path_provider/path_provider.dart';  // library for indirect filesystem access
+
 
 import 'markers.dart';
+import 'logging.dart';
 
+// run my app, while creating a DataStorage object
 void main() => runApp(MyApp(storage: DataStorage()));
 
 class MyApp extends StatefulWidget {
@@ -71,15 +72,15 @@ class _MyAppState extends State<MyApp> {
 
   // messages buffer from an connection, with incomplete helper buffer
   List<String> messages = <String>[];
-  String _temp_message_buffer = '';
+  String _temp_message_buffer = "";
+
+  // icon for location
+  BitmapDescriptor loc_icon;
 
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
     _map_controller = controller;
   }
-
-  // icon for location
-  BitmapDescriptor loc_icon;
 
 
   // registering our sensor stream subscriptions
@@ -132,11 +133,14 @@ class _MyAppState extends State<MyApp> {
       _start_discovering_devices();
     }
 
-    // Setup a list of the paired devices
+/*
+ // Setup a list of the paired devices
     FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> paired_devices) {
         available_devices += paired_devices;
         _connect_to_device(available_devices[0].address);
     });
+*/
+    _process_paired_devices();
 
     process_markers(context).then((Map <String, Marker> value) {
                               setState(() {
@@ -170,17 +174,32 @@ class _MyAppState extends State<MyApp> {
   }
 
   // disposal measures at the end of app
-   @override
-   void dispose(){
+  @override
+  void dispose(){
     super.dispose();
     // requests disabling of pairing mode
     FlutterBluetoothSerial.instance.setPairingRequestHandler(null);
 
+    _bl_serial_connection?.dispose();
     // unsubscribe from open streams to prevent memory leaks
     for (StreamSubscription<dynamic> subscription in _stream_subscriptions) {
       subscription?.cancel();
     }
    }
+
+  @override
+  void deactivate(){
+    super.deactivate();
+    // deactivate connection
+
+    _bl_serial_connection?.dispose();
+    setState(() {
+      // not connected anymore
+      _is_connected_to_serial = false;
+      // try to find device
+      _is_discovering = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -246,15 +265,18 @@ class _MyAppState extends State<MyApp> {
   }
 
 
-   void _stop_monitoring_devices(){
+   void _stop_monitoring_devices()
+   {
     _stream_subscriptions[0].pause();
   }
 
-   void _start_monitoring_devices(){
+   void _start_monitoring_devices()
+   {
      _stream_subscriptions[0].resume();
    }
 
-   void _on_data_received(Uint8List data) {
+   void _on_data_received(Uint8List data)
+   {
      // Allocate buffer for parsed data
      int backspacesCounter = 0;
      data.forEach((byte) {
@@ -316,7 +338,8 @@ class _MyAppState extends State<MyApp> {
    }
 
    // sends message through bluetooth connection
-   void _sendMessage(String text) {
+   void _sendMessage(String text)
+   {
      // remove leading and trailing spaces
      text = text.trim();
 
@@ -327,7 +350,8 @@ class _MyAppState extends State<MyApp> {
    }
 
    // connect to bluetooth device given its address
-   void _connect_to_device(String address){
+   void _connect_to_device(String address)
+   {
      // bluetooth connection to glove address
      BluetoothConnection.toAddress(address).then((_connection) {
        debugPrint('Connected to the device');
@@ -354,7 +378,8 @@ class _MyAppState extends State<MyApp> {
    }
 
    // Starts discovering available bluetooth devices
-   void _start_discovering_devices(){
+   void _start_discovering_devices()
+   {
      // Adding a subscription stream for searching/updating bluetooth devices
      _stream_subscriptions.add(
          FlutterBluetoothSerial.instance.startDiscovery().listen( (response) {
@@ -380,26 +405,19 @@ class _MyAppState extends State<MyApp> {
      });
 
    }
+
+   // Gets Paired devices, and connects to desired one
+   void _process_paired_devices()
+   {
+     // Setup a list of the paired devices
+     FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> paired_devices) {
+       available_devices += paired_devices;
+       _connect_to_device(available_devices[0].address);
+     });
+
+   }
+
 }
 
 
-class DataStorage{
-  // Gets path of Documents directory for app
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
 
-    return directory.path;
-  }
-
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/LOG.txt');
-  }
-
-  Future<File> write_data(String data) async {
-    final file = await _localFile;
-
-    // Write the file
-    return file.writeAsString('$data', mode:FileMode.append); // don't truncate file
-  }
-}

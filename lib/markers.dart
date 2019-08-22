@@ -1,4 +1,4 @@
-// Defines loading of markers and other related events
+// Defines loading of markers and other related events (such as data storage)
 import 'dart:async' show Future;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
