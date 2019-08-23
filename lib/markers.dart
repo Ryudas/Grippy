@@ -58,23 +58,7 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
     marker_prefs.setInt("counter", 3);
     */
 
-    /*
-    temp_marker.addAll({ "one": Marker( markerId: MarkerId("one"),
-                                        position: LatLng(52.011034,4.357725),
-                                        icon: marker_icons["fist_red"],
-                                ),
-                         "two": Marker( markerId: MarkerId("two"),
-                                        position: LatLng(52.0127,4.3559),
-                                        icon: marker_icons["fist_green"],
-                                ),
-                         "three": Marker(markerId: MarkerId("three"),
-                                         position: LatLng(52.0095,4.3588),
-                                         icon: marker_icons["fist_yellow"],
-                                ),
-    });
 
-
-     */
 
     debugPrint("lala");
     return(temp_marker);
@@ -105,4 +89,25 @@ Future<Map<String, BitmapDescriptor>> load_icons() async
   return(marker_icons);
 }
 
-// loads markers from saved shared preferences
+// add a marker to shared preferences
+// icon string can be "medal, fist_{red, green, yellow}"
+Future<bool> add_marker_prefs (double lat, double lng, String icon) async
+{
+
+  // get shared preferences instance object for our markers
+  SharedPreferences marker_prefs = await SharedPreferences.getInstance();
+  // get number of saved markers (zero if none exist)
+  var num_markers = (marker_prefs.getInt("counter") ?? 0);
+  var temp_marker = <String>[];
+  temp_marker.add("${lat}");
+  temp_marker.add("${lng}");
+  temp_marker.add(icon);
+  // index is still num markers, since theyre zero indexed
+  bool res = await marker_prefs.setStringList("${num_markers}",temp_marker);
+  res |=  await marker_prefs.setInt("counter", num_markers + 1);
+
+  // if failed will have to do again
+  return(res);
+
+
+}
