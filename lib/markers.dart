@@ -12,14 +12,9 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
     // map temporary markers
     var temp_marker = <String, Marker>{};
     // map of marker icons
-    var marker_icons = <String, BitmapDescriptor>{};
+    var marker_icons = await load_icons();
 
-    marker_icons.addAll({"medal": await load_asset("medal"),
-                         "fist_red": await load_asset("fist_red"),
-                         "fist_green": await load_asset("fist_green"),
-                         "fist_yellow": await load_asset("fist_yellow"),
-    });
-
+    
     temp_marker.addAll({ "one": Marker( markerId: MarkerId("one"),
                                         position: LatLng(52.011034,4.357725),
                                         icon: marker_icons["fist_red"],
@@ -46,4 +41,18 @@ Future<BitmapDescriptor> load_asset(String asset_name) async
                                           bundle: rootBundle
          ));
 
+}
+
+// loads all icon assets available to app, asynchronously
+Future<Map<String, BitmapDescriptor>> load_icons() async
+{
+  var marker_icons = <String, BitmapDescriptor>{};
+
+  marker_icons.addAll({"medal": await load_asset("medal"),
+                       "fist_red": await load_asset("fist_red"),
+                       "fist_green": await load_asset("fist_green"),
+                       "fist_yellow": await load_asset("fist_yellow"),
+                      });
+
+  return(marker_icons);
 }

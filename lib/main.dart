@@ -37,6 +37,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
+// widgets binding observer checks status of app
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // Map location markers
@@ -100,7 +101,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   }
 
 
-  // monitor app lyfecycle state
+  // monitor app lifecycle state
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch(state) {
@@ -317,194 +318,192 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     );
   }
 
+  void _stop_monitoring_devices()
+  {
+  _stream_subscriptions[0].pause();
+}
 
-   void _stop_monitoring_devices()
-   {
-    _stream_subscriptions[0].pause();
-  }
+  void _start_monitoring_devices()
+  {
+   _stream_subscriptions[0].resume();
+ }
 
-   void _start_monitoring_devices()
-   {
-     _stream_subscriptions[0].resume();
-   }
-
-   void _on_data_received(Uint8List data)
-   {
-     // Allocate buffer for parsed data
-     int backspacesCounter = 0;
-     data.forEach((byte) {
-       if (byte == 8 || byte == 127) {
-         backspacesCounter++;
-       }
-     });
-
-     Uint8List buffer = Uint8List(data.length - backspacesCounter);
-     int bufferIndex = buffer.length;
-
-     // Apply backspace control character
-     backspacesCounter = 0;
-     for (int i = data.length - 1; i >= 0; i--) {
-       if (data[i] == 8 || data[i] == 127) {
-         backspacesCounter++;
-       }
-       else {
-         if (backspacesCounter > 0) {
-           backspacesCounter--;
-         }
-         else {
-           buffer[--bufferIndex] = data[i];
-         }
-       }
+  void _on_data_received(Uint8List data)
+  {
+   // Allocate buffer for parsed data
+   int backspacesCounter = 0;
+   data.forEach((byte) {
+     if (byte == 8 || byte == 127) {
+       backspacesCounter++;
      }
+   });
 
-     // Create message if there is new line character
-     String dataString = String.fromCharCodes(buffer);
-     // index of endline ASCII character
-     int index = buffer.indexOf(13);
+   Uint8List buffer = Uint8List(data.length - backspacesCounter);
+   int bufferIndex = buffer.length;
 
-     if (~index != 0) { // \r\n
-         messages.add(
-             //  are there backspaces, then buffer is a substring
-             (backspacesCounter > 0 )?
-                 _temp_message_buffer.substring(0, _temp_message_buffer.length - backspacesCounter)
-                 : _temp_message_buffer + dataString.substring(0, index)
-         );
-         _temp_message_buffer = dataString.substring(index).trim();
-
-         // handle most current message data
-         handle_glove_data(messages.last);
-
+   // Apply backspace control character
+   backspacesCounter = 0;
+   for (int i = data.length - 1; i >= 0; i--) {
+     if (data[i] == 8 || data[i] == 127) {
+       backspacesCounter++;
      }
      else {
-       _temp_message_buffer = (
-           backspacesCounter > 0
-               ? _temp_message_buffer.substring(0, _temp_message_buffer.length - backspacesCounter)
-               : _temp_message_buffer
-               + dataString
-       );
+       if (backspacesCounter > 0) {
+         backspacesCounter--;
+       }
+       else {
+         buffer[--bufferIndex] = data[i];
+       }
      }
+   }
+
+   // Create message if there is new line character
+   String dataString = String.fromCharCodes(buffer);
+   // index of endline ASCII character
+   int index = buffer.indexOf(13);
+
+   if (~index != 0) { // \r\n
+       messages.add(
+           //  are there backspaces, then buffer is a substring
+           (backspacesCounter > 0 )?
+               _temp_message_buffer.substring(0, _temp_message_buffer.length - backspacesCounter)
+               : _temp_message_buffer + dataString.substring(0, index)
+       );
+       _temp_message_buffer = dataString.substring(index).trim();
+
+       // handle most current message data
+       handle_glove_data(messages.last);
+
+   }
+   else {
+     _temp_message_buffer = (
+         backspacesCounter > 0
+             ? _temp_message_buffer.substring(0, _temp_message_buffer.length - backspacesCounter)
+             : _temp_message_buffer
+             + dataString
+     );
+   }
 
 /*
-     // store messages
-     widget.storage.write_data(messages[0]).then( (File my_file){
-       debugPrint("${my_file.length()}");
-     });
+   // store messages
+   widget.storage.write_data(messages[0]).then( (File my_file){
+     debugPrint("${my_file.length()}");
+   });
 */
 
-     debugPrint("${messages.last}");
+   debugPrint("${messages.last}");
+ }
+
+  // sends message through bluetooth connection
+  void _sendMessage(String text)
+  {
+   // remove leading and trailing spaces
+   text = text.trim();
+
+   if (text.isNotEmpty)  {
+     _bl_serial_connection.output.add(utf8.encode(text + "\r\n"));
    }
 
-   // sends message through bluetooth connection
-   void _sendMessage(String text)
-   {
-     // remove leading and trailing spaces
-     text = text.trim();
+ }
 
-     if (text.isNotEmpty)  {
-       _bl_serial_connection.output.add(utf8.encode(text + "\r\n"));
-     }
+  // connect to bluetooth device given its address
+  void _connect_to_device(String address)
+  {
+   // bluetooth connection to glove address
+   BluetoothConnection.toAddress(address).then((_connection) {
+     debugPrint('Connected to the device');
+     _bl_serial_connection = _connection;
 
-   }
+     setState(() {
+       _is_connected_to_serial = true;
+     });
 
-   // connect to bluetooth device given its address
-   void _connect_to_device(String address)
-   {
-     // bluetooth connection to glove address
-     BluetoothConnection.toAddress(address).then((_connection) {
-       debugPrint('Connected to the device');
-       _bl_serial_connection = _connection;
 
+     _bl_serial_connection.input.listen(_on_data_received).onDone(() {
+       debugPrint('Disconnected by remote request');
+       _bl_serial_connection.finish();
        setState(() {
-         _is_connected_to_serial = true;
+         // not connected anymore
+         _is_connected_to_serial = false;
+         // try to find device
+         _is_discovering = true;
        });
 
 
-       _bl_serial_connection.input.listen(_on_data_received).onDone(() {
-         debugPrint('Disconnected by remote request');
-         _bl_serial_connection.finish();
+     });
+   });
+ }
+
+  // Starts discovering available bluetooth devices
+  void _start_discovering_devices()
+  {
+   // Adding a subscription stream for searching/updating bluetooth devices
+   _stream_subscriptions.add(
+       FlutterBluetoothSerial.instance.startDiscovery().listen( (response) {
          setState(() {
-           // not connected anymore
-           _is_connected_to_serial = false;
-           // try to find device
-           _is_discovering = true;
-         });
-
-
-       });
-     });
-   }
-
-   // Starts discovering available bluetooth devices
-   void _start_discovering_devices()
-   {
-     // Adding a subscription stream for searching/updating bluetooth devices
-     _stream_subscriptions.add(
-         FlutterBluetoothSerial.instance.startDiscovery().listen( (response) {
-           setState(() {
-             Iterator i = available_devices.iterator;
-             // iterate through devices
-             while (i.moveNext()) {
-               // get current device
-               BluetoothDevice device = i.current;
-               // update its rssi value
-               if (device == response.device) {
-                 _desired_device_rssi = response.rssi;
-               }
+           Iterator i = available_devices.iterator;
+           // iterate through devices
+           while (i.moveNext()) {
+             // get current device
+             BluetoothDevice device = i.current;
+             // update its rssi value
+             if (device == response.device) {
+               _desired_device_rssi = response.rssi;
              }
-           });
-         })
-     );
+           }
+         });
+       })
+   );
 
-     // CAREFUL HERE, using last....
-     _stream_subscriptions.last.onDone(() {
-        _is_discovering = false;
-     });
+   // CAREFUL HERE, using last....
+   _stream_subscriptions.last.onDone(() {
+      _is_discovering = false;
+   });
 
-   }
+ }
 
-   // Gets Paired devices, and connects to desired one
-   void _process_paired_devices()
-   {
-     // Setup a list of the paired devices
-     FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> paired_devices) {
-       available_devices += paired_devices;
-       _connect_to_device(available_devices[0].address);
-     });
+  // Gets Paired devices, and connects to desired one
+  void _process_paired_devices()
+  {
+   // Setup a list of the paired devices
+   FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> paired_devices) {
+     available_devices += paired_devices;
+     _connect_to_device(available_devices[0].address);
+   });
 
-   }
+ }
 
-   void handle_glove_data(String data)
+  void handle_glove_data(String data)
   {
 
-    // log incoming raw string glove data
-    widget.storage.write_data(data);
-    
-    // parse glove data into prepared object
-    var glove_data = GloveData(data);
-    running_avg.add_data_pt(glove_data.steps);
+  // log incoming raw string glove data
+  widget.storage.write_data(data);
+
+  // parse glove data into prepared object
+  var glove_data = GloveData(data);
+  running_avg.add_data_pt(glove_data.steps);
 
 
-    // process inactivity (every 4 minutes now)
-    if(running_avg.get_inactivity(50)){
-      // do inactivity actions
-    }
-
-    // process stress ( 100 - 130 - heart attack)
-    if( glove_data.heart_rate < 100){
-      // normal
-    } else if (glove_data.heart_rate < 130){ // mid to high
-      // mid
-    } else{
-      // high warning!
-    }
-
-    // process challenge
-    if(glove_data.challenge){
-      // send data
-    }
-
+  // process inactivity (every 4 minutes now)
+  if(running_avg.get_inactivity(50)){
+    // do inactivity actions
   }
 
+  // process stress ( 100 - 130 - heart attack)
+  if( glove_data.heart_rate < 100){
+    // normal
+  } else if (glove_data.heart_rate < 130){ // mid to high
+    // mid
+  } else{
+    // high warning!
+  }
+
+  // process challenge
+  if(glove_data.challenge){
+    // send data
+  }
+
+}
 
 }
 
