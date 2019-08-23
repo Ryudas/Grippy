@@ -109,5 +109,25 @@ Future<bool> add_marker_prefs (double lat, double lng, String icon) async
   // if failed will have to do again
   return(res);
 
+}
+
+// tries to remove all markers
+void  remove_all_markers() async
+{
+  // get shared preferences instance object for our markers
+  SharedPreferences marker_prefs = await SharedPreferences.getInstance();
+  // get number of saved markers (zero if none exist)
+  var num_markers = (marker_prefs.getInt("counter") ?? 0);
+
+  for(int i = 0; i < num_markers; i++)
+  {
+    // get each marker saved object and save new marker
+    // each ob has lat long, and string denoting which icon
+    bool res = await marker_prefs.remove("${i}");
+    // get number of saved markers (zero if none exist)
+    var temp = marker_prefs.getInt("counter");
+
+    if (res) await marker_prefs.setInt("counter", temp - 1 );
+  }
 
 }
