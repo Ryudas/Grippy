@@ -24,6 +24,7 @@ dependencies:
   geolocator: ^5.0.1
   flutter_bluetooth_serial: ^0.2.0
   path_provider: ^1.2.0
+  shared_preferences: ^0.5.3+4
   flutter:
     sdk: flutter
 

@@ -1,12 +1,16 @@
 // Defines loading of markers and other related events (such as data storage)
 import 'dart:async' show Future;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // for google maps
 import 'package:flutter/services.dart' show rootBundle;
+// shared preferences for file loading
+import 'package:shared_preferences/shared_preferences.dart';
 
 
-// function to process markers given locations in json file
+// function to process markers for the map display, given a shared pref
 Future<Map<String, Marker>> process_markers(BuildContext context) async
 {
     // map temporary markers
@@ -14,7 +18,47 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
     // map of marker icons
     var marker_icons = await load_icons();
 
-    
+    // get shared preferences instance object for our markers
+    SharedPreferences marker_prefs = await SharedPreferences.getInstance();
+    // get number of saved markers (zero if none exist)
+    var num_markers = (marker_prefs.getInt("counter") ?? 0);
+
+    for(int i = 0; i < num_markers; i++)
+    {
+         // get each marker saved object and save new marker
+         // each ob has lat long, and string denoting which icon
+         var marker_list = marker_prefs.getStringList("${i}");
+         temp_marker["${i}"] = Marker( markerId: MarkerId("${i}"),
+                                       position: LatLng(
+                                           double.parse(marker_list[0]),
+                                           double.parse(marker_list[1])
+                                       ),
+                                       icon: marker_icons[marker_list[2]],
+                               );                      
+    }
+
+    /*
+    var lala = [52.011034, 52.0127, 52.0095];
+    var lala_lng = [4.357725,4.3559, 4.3588];
+    var lala_str = ["fist_red", "fist_green", "fist_yellow"];
+    for(int i = 0; i < 3; i++)
+    {
+      // get each marker saved object and save new marker
+      // each ob has lat long, and string denoting which icon
+      // map temporary markers
+      var temp_marker = <String>[];
+      temp_marker.add("${lala[i]}");
+      temp_marker.add("${lala_lng[i]}");
+      temp_marker.add(lala_str[i]);
+
+      marker_prefs.setStringList("${i}", temp_marker);
+
+
+    }
+    marker_prefs.setInt("counter", 3);
+    */
+
+    /*
     temp_marker.addAll({ "one": Marker( markerId: MarkerId("one"),
                                         position: LatLng(52.011034,4.357725),
                                         icon: marker_icons["fist_red"],
@@ -29,6 +73,10 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
                                 ),
     });
 
+
+     */
+
+    debugPrint("lala");
     return(temp_marker);
 }
 
@@ -56,3 +104,5 @@ Future<Map<String, BitmapDescriptor>> load_icons() async
 
   return(marker_icons);
 }
+
+// loads markers from saved shared preferences
