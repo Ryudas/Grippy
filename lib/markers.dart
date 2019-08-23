@@ -37,30 +37,7 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
                                );                      
     }
 
-    /*
-    var lala = [52.011034, 52.0127, 52.0095];
-    var lala_lng = [4.357725,4.3559, 4.3588];
-    var lala_str = ["fist_red", "fist_green", "fist_yellow"];
-    for(int i = 0; i < 3; i++)
-    {
-      // get each marker saved object and save new marker
-      // each ob has lat long, and string denoting which icon
-      // map temporary markers
-      var temp_marker = <String>[];
-      temp_marker.add("${lala[i]}");
-      temp_marker.add("${lala_lng[i]}");
-      temp_marker.add(lala_str[i]);
-
-      marker_prefs.setStringList("${i}", temp_marker);
-
-
-    }
-    marker_prefs.setInt("counter", 3);
-    */
-
-
-
-    debugPrint("lala");
+    
     return(temp_marker);
 }
 
