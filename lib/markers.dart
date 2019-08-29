@@ -37,7 +37,7 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
                                );                      
     }
 
-    
+
     return(temp_marker);
 }
 

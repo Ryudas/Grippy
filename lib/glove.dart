@@ -17,16 +17,16 @@ class GloveData
       // and assign members
       switch(value[0])
       {
-        case "T": { this.timestamp = int.parse(value.substring(1)); }
+        case "t": { this.timestamp = int.parse(value.substring(1)); }
         break;
 
-        case "H": { this.heart_rate = int.parse(value.substring(1));}
+        case "h": { this.heart_rate = int.parse(value.substring(1));}
         break;
 
-        case "S": { this.steps =int.parse(value.substring(1)); }
+        case "s": { this.steps =int.parse(value.substring(1)); }
         break;
 
-        case "C": { this.challenge = bool.fromEnvironment(value.substring(1)); }
+        case "c": { this.challenge = bool.fromEnvironment(value.substring(1)); }
         break;
 
         default: { }
@@ -53,13 +53,14 @@ class ActivityRunningAvg{
   // default constructor
   // use frequency parameter (in seconds) to know
   // how often inactivity is rung
-  ActivityRunningAvg(this.frequency);
+  ActivityRunningAvg(this.frequency, this.glove_ODR);
 
   //holds amount of inputs
-  static int total_data_pts = 1;
+  static int total_data_pts = 0;
   // holds average activity
   double running_avg = 0;
   int frequency;
+  int glove_ODR;
 
   // returns true if running avr is low (compared to threshold)
   // in period frequency (depends on steps sampling rate)
@@ -71,7 +72,7 @@ class ActivityRunningAvg{
       return(false);
     }else{
       // reset running average
-      total_data_pts = 1;
+      total_data_pts = 0;
       if(running_avg < threshold) {
         return(true);
       }

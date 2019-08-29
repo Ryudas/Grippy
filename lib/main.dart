@@ -92,8 +92,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // icon for location
   BitmapDescriptor loc_icon;
 
-  // activity running average object
-  ActivityRunningAvg running_avg = ActivityRunningAvg(5);
+  // activity running average object (frequency denotes how often inactivity
+  // should be given out, sample rate establishes glove output data rate
+  ActivityRunningAvg running_avg = ActivityRunningAvg(15,5);
 
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -466,7 +467,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   void _process_paired_devices()
   {
    // Setup a list of the paired devices
-   FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> paired_devices) {
+   FlutterBluetoothSerial?.instance?.getBondedDevices()?.then((List<BluetoothDevice> paired_devices) {
      available_devices += paired_devices;
      _connect_to_device(available_devices[0].address);
    });
@@ -478,13 +479,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // log incoming raw string glove data
   widget.storage.write_data(data);
+  messages.removeLast();
 
   // parse glove data into prepared object
   var glove_data = GloveData(data);
   running_avg.add_data_pt(glove_data.steps);
 
 
-  // process inactivity (every 4 minutes now)
+  // process inactivity given a threshold of steps
   if(running_avg.get_inactivity(50)){
     // do inactivity actions
   }
