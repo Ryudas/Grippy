@@ -12,6 +12,7 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // blue
 import 'markers.dart';
 import 'logging.dart';
 import 'glove.dart';
+
 // logging only works for Android
 // run my app, while creating a DataStorage object for logging
 void main(){
@@ -129,7 +130,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     // must be included
     WidgetsBinding.instance.addObserver(this);
 
-    widget.storage.write_data("TESTING");
+    widget.storage.write_data("${DateTime.now()}");
 
 
     BitmapDescriptor.fromAssetImage( ImageConfiguration(bundle: rootBundle),
@@ -487,12 +488,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
   // process inactivity given a threshold of steps
-  if(running_avg.get_inactivity(50)){
+  if(running_avg?.get_inactivity(50)){
     // do inactivity actions
   }
 
   // process stress ( 100 - 130 - heart attack)
-  if( glove_data.heart_rate < 100){
+  if( glove_data?.heart_rate < 100){
     // normal
   } else if (glove_data.heart_rate < 130){ // mid to high
     // mid
@@ -501,7 +502,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   }
 
   // process challenge
-  if(glove_data.challenge){
+  if(glove_data?.challenge){
     // send data
   }
 

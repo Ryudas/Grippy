@@ -20,6 +20,6 @@ class DataStorage{
     final file = await _localFile;
 
     // Write the file
-    return file.writeAsString('$data', mode:FileMode.append); // don't truncate file
+    return file.writeAsString("$data\n", mode:FileMode.append); // don't truncate file
   }
 }
