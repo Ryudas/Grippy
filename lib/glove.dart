@@ -38,10 +38,10 @@ class GloveData
 
   }
 
-  int timestamp;
-  int heart_rate;
-  int steps;
-  bool challenge;
+  int timestamp= -1;
+  int heart_rate =-1;
+  int steps =-1;
+  bool challenge = false;
 
 
 }

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial library
-
+import 'package:fluttertoast/fluttertoast.dart'; // package for displaying toast messages in app
 
 import 'markers.dart';
 import 'logging.dart';
@@ -94,8 +94,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   BitmapDescriptor loc_icon;
 
   // activity running average object (frequency denotes how often inactivity
-  // should be given out, sample rate establishes glove output data rate
-  ActivityRunningAvg running_avg = ActivityRunningAvg(15,5);
+  // should be given out (in seconds), sample rate establishes glove output data rate
+  ActivityRunningAvg running_avg = ActivityRunningAvg(3600,5);
 
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -129,6 +129,26 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     super.initState(); // must be included
     // must be included
     WidgetsBinding.instance.addObserver(this);
+
+    // Location subscription
+    var geolocator = Geolocator();
+    // desired accuracy and the minimum distance change
+    // (in meters) before updates are sent to the application - 1m in our case.
+    var location_options = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 1);
+    _stream_subscriptions.add(
+        geolocator.getPositionStream(location_options).listen((Position event) {
+          setState(() {
+            _loc_values = <String>[event.latitude.toStringAsFixed(3),
+              event.longitude.toStringAsFixed(3),
+              event.altitude.toStringAsFixed(3),
+              event.speed.toStringAsFixed(3),
+              event.timestamp.toString()];
+
+          });
+
+        })
+    );
+
 
     widget.storage.write_data("${DateTime.now()}");
 
@@ -193,24 +213,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     
     
     
-    // Location subscription
-    var geolocator = Geolocator();
-    // desired accuracy and the minimum distance change
-    // (in meters) before updates are sent to the application - 1m in our case.
-    var location_options = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 1);
-    _stream_subscriptions.add(
-        geolocator.getPositionStream(location_options).listen((Position event) {
-              setState(() {
-                _loc_values = <String>[event.latitude.toStringAsFixed(3),
-                  event.longitude.toStringAsFixed(3),
-                  event.altitude.toStringAsFixed(3),
-                  event.speed.toStringAsFixed(3),
-                  event.timestamp.toString()];
 
-              });
-
-            })
-    );
 
 
 
@@ -490,6 +493,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // process inactivity given a threshold of steps
   if(running_avg?.get_inactivity(50)){
     // do inactivity actions
+    Fluttertoast.showToast(
+        msg: "You've been quite inactive so far!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 20,
+        backgroundColor: Colors.cyan,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+
   }
 
   // process stress ( 100 - 130 - heart attack)
@@ -502,8 +515,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   }
 
   // process challenge
-  if(glove_data?.challenge){
+  if(glove_data.challenge){
     // send data
+
+    Fluttertoast.showToast(
+        msg: "Challenge begin!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 10,
+        backgroundColor: Colors.cyan,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
   }
 
 }
