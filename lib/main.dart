@@ -575,6 +575,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   }
 
+  // utility function to send location data to glove
+  // if no connection exists, does not do anything
+  void send_loc_data(){
+    if(_bl_serial_connection.isConnected){
+      var loc_msg = """lat${_curr_location.position.latitude},
+                    lng${_curr_location.position.latitude}""";
+
+      _sendMessage(loc_msg);
+    }
+  }
+
 }
 
 
