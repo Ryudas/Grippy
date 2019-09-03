@@ -95,7 +95,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // activity running average object (frequency denotes how often inactivity
   // should be given out (in seconds), sample rate establishes glove output data rate
-  ActivityRunningAvg running_avg = ActivityRunningAvg(3600,5);
+  ActivityRunningAvg running_avg = ActivityRunningAvg(10,5);
 
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -396,7 +396,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
    });
 */
 
-   debugPrint("${messages.last}");
+   //debugPrint("${messages.last}");
  }
 
   // sends message through bluetooth connection
@@ -481,55 +481,58 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   void handle_glove_data(String data)
   {
 
-  // log incoming raw string glove data
-  widget.storage.write_data(data);
-  messages.removeLast();
+      // log incoming raw string glove data
+      widget.storage.write_data(data);
+      //debugPrint("${messages.last}");
+      messages.removeLast();
 
-  // parse glove data into prepared object
-  var glove_data = GloveData(data);
-  running_avg.add_data_pt(glove_data.steps);
+      // parse glove data into prepared object
+      var glove_data = GloveData(data);
+      running_avg.add_data_pt(glove_data.steps);
 
 
-  // process inactivity given a threshold of steps
-  if(running_avg?.get_inactivity(50)){
-    // do inactivity actions
-    Fluttertoast.showToast(
-        msg: "You've been quite inactive so far!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIos: 20,
-        backgroundColor: Colors.cyan,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
+      // process inactivity given a threshold of steps
+      if(running_avg?.get_inactivity(50)){
+        // do inactivity actions
+        _sendMessage("${(GloveProtocol.inactivity_alarm.index) + 1}");
+        debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");
+        Fluttertoast.showToast(
+            msg: "You've been quite inactive so far!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIos: 20,
+            backgroundColor: Colors.cyan,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+
+      }
+
+      // process stress ( 100 - 130 - heart attack)
+      if( glove_data?.heart_rate < 100){
+        // normal
+      } else if (glove_data.heart_rate < 130){ // mid to high
+        // mid
+      } else{
+        // high warning!
+      }
+
+      // process challenge
+      if(glove_data.challenge){
+        // send data
+
+        Fluttertoast.showToast(
+            msg: "Challenge begin!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIos: 10,
+            backgroundColor: Colors.cyan,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
 
   }
-
-  // process stress ( 100 - 130 - heart attack)
-  if( glove_data?.heart_rate < 100){
-    // normal
-  } else if (glove_data.heart_rate < 130){ // mid to high
-    // mid
-  } else{
-    // high warning!
-  }
-
-  // process challenge
-  if(glove_data.challenge){
-    // send data
-
-    Fluttertoast.showToast(
-        msg: "Challenge begin!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIos: 10,
-        backgroundColor: Colors.cyan,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
-  }
-
-}
 
 }
 

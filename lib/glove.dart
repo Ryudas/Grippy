@@ -48,7 +48,8 @@ class GloveData
 
 // class maintaining total steps running
 // average used for inactivity checking
-class ActivityRunningAvg{
+class ActivityRunningAvg
+{
 
   // default constructor
   // use frequency parameter (in seconds) to know
@@ -92,4 +93,17 @@ class ActivityRunningAvg{
 
 
 
+}
+
+// enum type (careful with order)
+// order gives the value of enum type
+// (starts at zero), up to 3 (for now)
+// that has all possible message types
+// for sending to the glove
+enum GloveProtocol
+{
+    challenge_start,
+    challenge_vib,
+    inactivity_alarm,
+    stress_alarm
 }
