@@ -102,7 +102,7 @@ class ActivityRunningAvg
 // for sending to the glove
 enum GloveProtocol
 {
-    challenge_start,
+    challenge_detected,
     challenge_vib,
     inactivity_alarm,
     stress_alarm

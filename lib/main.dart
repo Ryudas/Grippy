@@ -495,7 +495,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       // process inactivity given a threshold of steps
       if(running_avg?.get_inactivity(50)){
         // do inactivity actions
-        _sendMessage("${(GloveProtocol.inactivity_alarm.index) + 1}");
+        _sendMessage("${(GloveProtocol.inactivity_alarm.index)}");
         // debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");
         // log event
         widget.storage.write_data("${DateTime.now().toUtc()}, Inactivity detected!\n");
@@ -520,13 +520,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         // mid
       } else{
         // high warning!
-        // do high stress actions
-        _sendMessage("${(GloveProtocol.stress_alarm.index) + 1}");
+        // do high stress actions (index returns enum value)
+        _sendMessage("${(GloveProtocol.stress_alarm.index)}");
         // log event
         widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
 
-        // add marker to map
-        add_marker("high");
+        // add marker( high stress) to map
+        add_marker("fist_red");
       }
 
       // process challenge
@@ -543,6 +543,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
             fontSize: 16.0
         );
         widget.storage.write_data("${DateTime.now().toUtc()}, Challenge started!\n");
+        // do challenge actions (index returns enum value)
+        _sendMessage("${(GloveProtocol.challenge_vib.index)}");
       }
 
   }
@@ -570,7 +572,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                      icon_id
     );
 
-    
+
   }
 
 }
