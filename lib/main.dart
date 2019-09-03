@@ -44,6 +44,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // Map location markers
    Map<String, Marker> _markers = <String, Marker>{};
 
+  // Map of possible marker icons
+  Map<String, BitmapDescriptor> marker_icons= <String, BitmapDescriptor>{};
+
   // current user location marker
   Marker _curr_location;
 
@@ -210,12 +213,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                                 _markers.addAll(value);
                               });
                             });
-    
-    
-    
 
+    load_icons().then((Map <String, BitmapDescriptor> value) {
 
-
+                      });
 
   }
 
@@ -495,7 +496,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       if(running_avg?.get_inactivity(50)){
         // do inactivity actions
         _sendMessage("${(GloveProtocol.inactivity_alarm.index) + 1}");
-        debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");
+        // debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");
+        // log event
+        widget.storage.write_data("${DateTime.now().toUtc()}, Inactivity detected!\n");
+
+        // show warning message
         Fluttertoast.showToast(
             msg: "You've been quite inactive so far!",
             toastLength: Toast.LENGTH_SHORT,
@@ -511,10 +516,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       // process stress ( 100 - 130 - heart attack)
       if( glove_data?.heart_rate < 100){
         // normal
-      } else if (glove_data.heart_rate < 130){ // mid to high
+      } else if (glove_data.heart_rate < 120){ // mid to high
         // mid
       } else{
         // high warning!
+        // do high stress actions
+        _sendMessage("${(GloveProtocol.stress_alarm.index) + 1}");
+        // log event
+        widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
+
+        // add marker to map
+        add_marker("high");
       }
 
       // process challenge
@@ -530,8 +542,35 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
             textColor: Colors.white,
             fontSize: 16.0
         );
+        widget.storage.write_data("${DateTime.now().toUtc()}, Challenge started!\n");
       }
 
+  }
+
+  // adds a particular marker to map, depending on stress value (low, medium high)
+  // then add it to the shared preferences.
+  void add_marker(String icon_id)
+  {
+    // useless if it is
+    if(marker_icons.isEmpty) return;
+
+
+    // add marker to make, using
+    setState(() {
+      _markers.addAll({ "${_markers.length}":
+                        Marker( markerId: MarkerId("${_markers.length}"),
+                                position: _curr_location.position,
+                                icon: marker_icons[icon_id],
+                        )
+      });
+    });
+
+    add_marker_prefs(_curr_location.position.latitude,
+                     _curr_location.position.longitude,
+                     icon_id
+    );
+
+    
   }
 
 }
