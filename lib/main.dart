@@ -100,6 +100,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // should be given out (in seconds), sample rate establishes glove output data rate
   ActivityRunningAvg running_avg = ActivityRunningAvg(10,5);
 
+  // distance threshold for warning near previous stress area (20 m)
+   double _distance_threshold = 30.0;
+
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
     _map_controller = controller;
@@ -195,9 +198,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       });
     });
 
-    if(_is_discovering){
-     // _start_discovering_devices();
-    }
+//    if(_is_discovering){
+//     // _start_discovering_devices();
+//    }
 
 /*
  // Setup a list of the paired devices
@@ -208,6 +211,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 */
     _process_paired_devices();
 
+    // load saved markers in shared preferences
     process_markers(context).then((Map <String, Marker> value) {
                               setState(() {
                                 _markers.addAll(value);
@@ -263,13 +267,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
-
+    // are we discovering for bluetooth devices?
     if(_is_discovering){
       _start_discovering_devices();
     }
 
+    // lets do our location processing code
     if(_loc_values != null)
     {
+      // adding current location
         _curr_location = Marker( markerId: MarkerId("location"),
                                 position: LatLng(double.parse(_loc_values[0]),
                                                  double.parse(_loc_values[1])
@@ -277,6 +283,29 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         // if icon is available, else use blue marker
         icon:  loc_icon ??  BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       );
+
+      // checking for close distance to close spots
+      if(_markers.isNotEmpty)
+      {
+        // iterate over every map entry
+        _markers.forEach( ( String marker_id, Marker marker) {
+          // everything but location
+          if (marker_id != "loc")
+          {
+            var distance = Geolocator().distanceBetween(_curr_location.position.latitude,
+                                                        _curr_location.position.longitude,
+                                                        marker.position.latitude,
+                                                        marker.position.longitude);
+
+            distance.then( ( double dis_value) {
+                if(dis_value < _distance_threshold){
+                  // trigger something
+                }
+            });
+
+          }
+        });
+      }
     }
 
     // if current location is null, don't do anything
