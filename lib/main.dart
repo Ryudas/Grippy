@@ -377,6 +377,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
        );
        _temp_message_buffer = dataString.substring(index).trim();
 
+       // process any empty messages
+       if(messages.last == "")
+       {
+          messages.removeLast();
+          return;
+       }
+       debugPrint("${messages.last}");
        // handle most current message data
        handle_glove_data(messages.last);
 
@@ -463,6 +470,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
    // CAREFUL HERE, using last....
    _stream_subscriptions.last.onDone(() {
+      _stream_subscriptions.removeLast();
       _is_discovering = false;
    });
 

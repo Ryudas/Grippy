@@ -2,7 +2,6 @@
 // including parsing, and processing of glove
 // data. Also includes app/glove interactions
 
-import 'package:flutter/foundation.dart';
 
 
 // class packing glove data, including parsing constructor
@@ -12,10 +11,10 @@ class GloveData
   GloveData(String data){
     // remove end lines and other termination chars
     var temp_str = data.trim();
+
     // split into comma separated strings and process these
     temp_str.split(",").forEach(( String value) {
-
-      debugPrint("Value of glovedata: ${value}");
+     // if(value.isEmpty) continue;
       // get first character, the identifier
       // and assign members
       switch(value[0])
