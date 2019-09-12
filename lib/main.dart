@@ -196,7 +196,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     });
 
     if(_is_discovering){
-      _start_discovering_devices();
+     // _start_discovering_devices();
     }
 
 /*
@@ -453,7 +453,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
    // Adding a subscription stream for searching/updating bluetooth devices
    _stream_subscriptions.add(
        FlutterBluetoothSerial.instance.startDiscovery().listen( (response) {
-         setState(() {
+
            Iterator i = available_devices.iterator;
            // iterate through devices
            while (i.moveNext()) {
@@ -464,12 +464,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                _desired_device_rssi = response.rssi;
              }
            }
-         });
+
+
        })
    );
 
    // CAREFUL HERE, using last....
-   _stream_subscriptions.last.onDone(() {
+   _stream_subscriptions.last.onDone( () {
       _stream_subscriptions.removeLast();
       _is_discovering = false;
    });
