@@ -215,8 +215,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                             });
 
     load_icons().then((Map <String, BitmapDescriptor> value) {
-
-                      });
+                        marker_icons.addAll(value);
+                 });
 
   }
 
@@ -516,6 +516,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       // process stress ( 100 - 130 - heart attack)
       if( glove_data?.heart_rate < 100){
         // normal
+        //place_marker("fist_red");
       } else if (glove_data.heart_rate < 120){ // mid to high
         // mid
       } else{
@@ -526,7 +527,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
 
         // add marker( high stress) to map
-        add_marker("fist_red");
+        place_marker("fist_red");
       }
 
       // process challenge
@@ -551,28 +552,26 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // adds a particular marker to map, depending on stress value (low, medium high)
   // then add it to the shared preferences.
-  void add_marker(String icon_id)
+  void place_marker(String icon_id)
   {
-    // useless if it is
-    if(marker_icons.isEmpty) return;
+      // useless if it is
+      if(marker_icons.isEmpty) return;
 
-
-    // add marker to make, using
-    setState(() {
-      _markers.addAll({ "${_markers.length}":
-                        Marker( markerId: MarkerId("${_markers.length}"),
-                                position: _curr_location.position,
-                                icon: marker_icons[icon_id],
-                        )
+      // add marker to make, using
+      setState(() {
+        debugPrint("${_markers.length}");
+        _markers.addAll({ "${_markers.length}":
+        Marker( markerId: MarkerId("${_markers.length}"),
+          position: _curr_location.position,
+          icon: marker_icons[icon_id],
+        )
+        });
       });
-    });
 
-    add_marker_prefs(_curr_location.position.latitude,
-                     _curr_location.position.longitude,
-                     icon_id
-    );
-
-
+      add_marker_prefs(_curr_location.position.latitude,
+          _curr_location.position.longitude,
+          icon_id
+      );
   }
 
   // utility function to send location data to glove
