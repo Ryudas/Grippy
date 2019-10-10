@@ -540,7 +540,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         _sendMessage("${(GloveProtocol.inactivity_alarm.index)}");
         // debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");
         // log event
-        widget.storage.write_data("${DateTime.now().toUtc()}, Inactivity detected!\n");
+        //widget.storage.write_data("${DateTime.now().toUtc()}, Inactivity detected!\n");
 
         // show warning message
         Fluttertoast.showToast(
@@ -579,12 +579,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         }
 
         // log event
-        widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
+       // widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
 
         // add marker( high stress) to map
-        place_marker("fist_red");
-      }
+        //place_marker("fist_red");
 
+      }
+      remove_all_markers();
       // process challenge
       if(glove_data.challenge){
         // send data
@@ -598,10 +599,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
             textColor: Colors.white,
             fontSize: 16.0
         );
-        widget.storage.write_data("${DateTime.now().toUtc()}, Challenge started!\n");
+        //widget.storage.write_data("${DateTime.now().toUtc()}, Challenge started!\n");
         // do challenge actions (index returns enum value)
         _sendMessage("${(GloveProtocol.challenge_vib.index)}");
       }
+
+      // general log
+      var date = DateTime.fromMillisecondsSinceEpoch(glove_data.timestamp * 1000);
+      widget.storage.write_data("${date.day}.${date.month}.${date.year},${date.hour}:"
+                                "${date.minute}:${date.second},${glove_data.heart_rate},"
+                                " , ,${glove_data.challenge},${_curr_location.toString()},"
+                                ", , , , ");
 
   }
 
