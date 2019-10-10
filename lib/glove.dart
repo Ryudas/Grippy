@@ -39,7 +39,7 @@ class GloveData
 
           case "c":
             {
-              this.challenge = bool.fromEnvironment(value.substring(1));
+              this.challenge = ((value.substring(1)) == "1" )? true : false ;
             }
             break;
 
