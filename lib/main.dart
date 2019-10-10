@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
@@ -40,6 +41,8 @@ class MyApp extends StatefulWidget {
 
 // widgets binding observer checks status of app
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
+
+  var lala = 0;
 
   // Map location markers
    Map<String, Marker> _markers = <String, Marker>{};
@@ -98,7 +101,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // activity running average object (frequency denotes how often inactivity
   // should be given out (in seconds), sample rate establishes glove output data rate
-  ActivityRunningAvg running_avg = ActivityRunningAvg(10,5);
+  ActivityRunningAvg running_avg = ActivityRunningAvg(7200,5);
 
   // distance threshold for warning near previous stress area (20 m)
    double _distance_threshold = 30.0;
@@ -160,12 +163,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
     BitmapDescriptor.fromAssetImage( ImageConfiguration(bundle: rootBundle),
-                                     "assets/medal/4.0x/icon.png"
+                                     "assets/curr_loc/4.0x/icon.png"
     ).then( (BitmapDescriptor icon) {
         setState(() {
           loc_icon = icon;
         });
     });
+
 
     // Get current state
     FlutterBluetoothSerial.instance.state.then((state) {
@@ -551,16 +555,29 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
       }
 
+
+
       // process stress ( 100 - 130 - heart attack)
       if( glove_data?.heart_rate < 100){
         // normal
         //place_marker("fist_red");
+
+        if(lala == 0) {
+          _sendMessage("${(GloveProtocol.stress_alarm.index)}");
+          lala = 1;
+        }
+
       } else if (glove_data.heart_rate < 120){ // mid to high
         // mid
       } else{
         // high warning!
         // do high stress actions (index returns enum value)
-        _sendMessage("${(GloveProtocol.stress_alarm.index)}");
+        //_sendMessage("${(GloveProtocol.stress_alarm.index)}");
+        if(lala == 0) {
+          _sendMessage("${(GloveProtocol.stress_alarm.index)}");
+          lala = 1;
+        }
+
         // log event
         widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
 

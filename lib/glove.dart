@@ -17,22 +17,36 @@ class GloveData
      // if(value.isEmpty) continue;
       // get first character, the identifier
       // and assign members
-      switch(value[0])
-      {
-        case "t": { this.timestamp = int.parse(value.substring(1)); }
-        break;
+      if( value.isNotEmpty) {
+        switch (value[0]) {
+          case "t":
+            {
+              this.timestamp = int.parse(value.substring(1));
+            }
+            break;
 
-        case "h": { this.heart_rate = int.parse(value.substring(1));}
-        break;
+          case "h":
+            {
+              this.heart_rate = int.parse(value.substring(1));
+            }
+            break;
 
-        case "s": { this.steps =int.parse(value.substring(1)); }
-        break;
+          case "s":
+            {
+              this.steps = int.parse(value.substring(1));
+            }
+            break;
 
-        case "c": { this.challenge = bool.fromEnvironment(value.substring(1)); }
-        break;
+          case "c":
+            {
+              this.challenge = bool.fromEnvironment(value.substring(1));
+            }
+            break;
 
-        default: { }
-        break;
+          default:
+            {}
+            break;
+        }
       }
 
     });
