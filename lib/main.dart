@@ -42,7 +42,6 @@ class MyApp extends StatefulWidget {
 // Widgets binding observer checks status of app
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
-  var lala = 0;
 
   // Map location markers
    Map<String, Marker> _markers = <String, Marker>{};
@@ -82,8 +81,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // List of devices with availability
   List<BluetoothDevice> available_devices = <BluetoothDevice>[];
-  // Rssi of desired device
-  int _desired_device_rssi;
 
   // Bluetooth serial connection
   BluetoothConnection _bl_serial_connection;
@@ -106,6 +103,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // distance threshold for warning near previous stress area (20 m)
    double _distance_threshold = 30.0;
+
+  // previous received challenge
+   bool previous_challenge = false;
 
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -554,23 +554,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       // process stress ( 100 - 130 - heart attack)
       if( glove_data?.heart_rate < 100){
         // normal
-        //place_marker("fist_red");
 
-        if(lala == 0) {
-          _sendMessage("${(GloveProtocol.stress_alarm.index)}");
-          lala = 1;
-        }
 
-      } else if (glove_data.heart_rate < 120){ // mid to high
-        // mid
+
+      } else if (glove_data.heart_rate < 120)
+
+
+      {
+        // mid to high
       } else{
+
         // high warning!
         // do high stress actions (index returns enum value)
         //_sendMessage("${(GloveProtocol.stress_alarm.index)}");
-        if(lala == 0) {
-          _sendMessage("${(GloveProtocol.stress_alarm.index)}");
-          lala = 1;
-        }
+
 
         // log event
         widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
@@ -580,13 +577,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
       }
 
-      remove_all_markers();
       // process challenge
       if(glove_data.challenge){
         // send data
 
         Fluttertoast.showToast(
-            msg: "Challenge begin!",
+            msg: "Challenge started!",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIos: 10,

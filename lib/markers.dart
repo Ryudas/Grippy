@@ -4,8 +4,10 @@ import 'dart:async' show Future;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart'; // for google maps
+// for google maps
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
 // shared preferences for file loading
 import 'package:shared_preferences/shared_preferences.dart';
 
