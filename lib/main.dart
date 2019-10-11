@@ -14,8 +14,8 @@ import 'markers.dart';
 import 'logging.dart';
 import 'glove.dart';
 
-// logging only works for Android
-// run my app, while creating a DataStorage object for logging
+// Logging only works for Android
+// Run my app, while creating a DataStorage object for logging
 void main(){
   runApp( MaterialApp(
       onGenerateRoute: (RouteSettings settings) {
@@ -39,7 +39,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-// widgets binding observer checks status of app
+// Widgets binding observer checks status of app
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   var lala = 0;
@@ -50,11 +50,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // Map of possible marker icons
   Map<String, BitmapDescriptor> marker_icons= <String, BitmapDescriptor>{};
 
-  // current user location marker
+  // Current user location marker
   Marker _curr_location;
 
 
-  // stores list of subscriptions to sensor event streams (async data sources)
+  // Stores list of subscriptions to sensor event streams (async data sources)
   List<StreamSubscription<dynamic>> _stream_subscriptions =
   <StreamSubscription<dynamic>>[];
 
@@ -67,13 +67,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   List<String> _loc_values;
 
 
-  // creating google map controller object
+  // Creating google map controller object
   GoogleMapController _map_controller;
-  // bluetooth state
+  // Bluetooth state
   BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
 
 
-  // class , type of object that represents a position in the world
+  // Class , type of object that represents a position in the world
   final LatLng _center = const LatLng(52.011578, 4.357068); // Latitude longitude
 
   // bluetooth address and name
@@ -85,14 +85,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // Rssi of desired device
   int _desired_device_rssi;
 
-  // bluetooth serial connection
+  // Bluetooth serial connection
   BluetoothConnection _bl_serial_connection;
-  // whether device is connected to serial
+  // Whether device is connected to serial
   bool _is_connected_to_serial = false;
-  // if bluetooth discovering is active (starts active)
+
+  // If bluetooth discovering is active (starts active)
   bool _is_discovering = true;
 
-  // messages buffer from an connection, with incomplete helper buffer
+  // Messages buffer from an connection, with incomplete helper buffer
   List<String> messages = <String>[];
   String _temp_message_buffer = "";
 
@@ -248,6 +249,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     }
    }
 
+  // handle deactivation procedures
   @override
   void deactivate(){
     super.deactivate();
@@ -357,16 +359,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     );
   }
 
-  void _stop_monitoring_devices()
-  {
-  _stream_subscriptions[0].pause();
-}
-
-  void _start_monitoring_devices()
-  {
-   _stream_subscriptions[0].resume();
- }
-
+  // Handle raw bluetooth data packet into string
   void _on_data_received(Uint8List data)
   {
    // Allocate buffer for parsed data
@@ -440,7 +433,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
    //debugPrint("${messages.last}");
  }
 
-  // sends message through bluetooth connection
+  // Sends message through bluetooth connection
   void _sendMessage(String text)
   {
    // remove leading and trailing spaces
@@ -452,7 +445,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
  }
 
-  // connect to bluetooth device given its address
+  // Connect to bluetooth device given its address
   void _connect_to_device(String address)
   {
    // bluetooth connection to glove address
@@ -521,6 +514,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
  }
 
+  // Handles glove data packet
   void handle_glove_data(String data)
   {
 
@@ -579,12 +573,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         }
 
         // log event
-       // widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
+        widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
 
         // add marker( high stress) to map
-        //place_marker("fist_red");
+        place_marker("fist_red");
 
       }
+
       remove_all_markers();
       // process challenge
       if(glove_data.challenge){
@@ -648,6 +643,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     }
   }
 
+
+  void _stop_monitoring_devices()
+  {
+    _stream_subscriptions[0].pause();
+  }
+
+  void _start_monitoring_devices()
+  {
+    _stream_subscriptions[0].resume();
+  }
 }
 
 
