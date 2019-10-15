@@ -79,7 +79,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   String _bl_adapter_address;
   String _bl_adapter_name;
 
-  // List of devices with availability
+   int _desired_device_rssi;
+
+   // List of devices with availability
   List<BluetoothDevice> available_devices = <BluetoothDevice>[];
 
   // Bluetooth serial connection
@@ -104,8 +106,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // distance threshold for warning near previous stress area (20 m)
    double _distance_threshold = 30.0;
 
-  // previous received challenge
-   bool previous_challenge = false;
+  // previous received challenge, helps not sending continuous messaging
+  bool previous_challenge = false;
 
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -577,22 +579,23 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
       }
 
-      // process challenge
-      if(glove_data.challenge){
+      // process challenge if we received a challenge,
+      // and the previous received was not a challenge
+      if(glove_data.challenge & !previous_challenge){
         // send data
 
         Fluttertoast.showToast(
             msg: "Challenge started!",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
-            timeInSecForIos: 10,
+            timeInSecForIos: 30,
             backgroundColor: Colors.cyan,
             textColor: Colors.white,
             fontSize: 16.0
         );
         //widget.storage.write_data("${DateTime.now().toUtc()}, Challenge started!\n");
         // do challenge actions (index returns enum value)
-        _sendMessage("${(GloveProtocol.challenge_vib.index)}");
+        //_sendMessage("${(GloveProtocol.challenge_vib.index)}");
       }
 
       // general log
@@ -601,6 +604,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                                 "${date.minute}:${date.second},${glove_data.heart_rate},"
                                 " , ,${glove_data.challenge},${_curr_location.toString()},"
                                 ", , , , ");
+
+      // set previous message packet challenge status
+      previous_challenge = glove_data.challenge;
 
   }
 

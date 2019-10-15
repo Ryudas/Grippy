@@ -13,7 +13,7 @@ class DataStorage{
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/LOG.csv');
+    return File('$path/LOG.txt');
   }
 
   Future<File> write_data(String data) async {
