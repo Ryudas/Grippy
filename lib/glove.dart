@@ -42,7 +42,7 @@ class GloveData
             }
             break;
 
-          case "sl": // stress level
+          case "sl": // stress level 1, 2 and 3
             {
               this.stress_level = int.parse(value.substring(2));
             }

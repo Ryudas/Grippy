@@ -535,7 +535,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   {
 
       // log incoming raw string glove data
-      widget.storage.write_data(data);
+      //widget.storage.write_data(data);
       //debugPrint("${messages.last}");
       messages.removeLast();
 
@@ -593,9 +593,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
       }
 
-      // process challenge if we received a challenge,
+      // process challenge if challenge is running(comfort mode),
       // and the previous received was not a challenge
-      if(glove_data.challenge & !previous_challenge){
+      if(glove_data.comfort & !previous_challenge){
         // send data
 
         Fluttertoast.showToast(
@@ -610,6 +610,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         //widget.storage.write_data("${DateTime.now().toUtc()}, Challenge started!\n");
         // do challenge actions (index returns enum value)
         //_sendMessage("${(GloveProtocol.challenge_vib.index)}");
+        place_marker("medal");
       }
 
       // general log
@@ -619,7 +620,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
       // set previous message packet challenge status
-      previous_challenge = glove_data.challenge;
+      previous_challenge = glove_data.comfort;
 
   }
 
