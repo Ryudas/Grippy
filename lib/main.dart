@@ -125,16 +125,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch(state) {
       case AppLifecycleState.resumed:
+        _process_paired_devices();
       // Handle this case
         break;
       case AppLifecycleState.inactive:
-      // Handle this case
+        dispose_bl_connection();
         break;
       case AppLifecycleState.paused:
-      // Handle this case
+        dispose_bl_connection();
         break;
       case AppLifecycleState.suspending:
-      // Handle this case
+        dispose_bl_connection();
         break;
     }
   }
@@ -339,7 +340,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Get a Grip'),
+          title: Text('Grippy'),
           backgroundColor: Color(0xFF0085AC),
           // in case we have recording, adding a record button
           leading: Visibility(
@@ -683,6 +684,25 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     log_line += "${glove_data.challenge},${glove_data.comfort},";
 
     widget.storage.write_data(log_line);
+  }
+
+  // disposes bluetooth connection
+  void dispose_bl_connection(){
+
+    if(_bl_serial_connection.isConnected && _bl_serial_connection != null) {
+      //  Avoid memory leak (`setState` after dispose) and disconnect
+      _bl_serial_connection?.dispose();
+      _bl_serial_connection = null;
+
+      debugPrint("Disconnecting locally.");
+    }
+
+    setState(() {
+      // not connected anymore
+      _is_connected_to_serial = false;
+      // try to find device
+      _is_discovering = true;
+    });
   }
 }
 
