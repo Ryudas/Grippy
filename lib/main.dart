@@ -675,11 +675,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     String log_line= "${date.day}.${date.month}.${date.year},${date.hour}:"
                       "${date.minute}:${date.second},";
 
-    log_line += "${glove_data.heart_rate},${glove_data.heart_rate},";
-    widget.storage.write_data("${date.day}.${date.month}.${date.year},${date.hour}:"
-        "${date.minute}:${date.second},${glove_data.heart_rate},"
-        " , ,${glove_data.challenge},${_curr_location.toString()},"
-        ", , , , ");
+    // data section
+    log_line += "${glove_data.heart_rate},${glove_data.stress_level},";
+    log_line += "${glove_data.steps},${glove_data.acceleration},";
+    log_line += "${_curr_location.position.latitude},${_curr_location.position.longitude},";
+    log_line += "${glove_data.stress_alarm},${glove_data.inact_alarm},";
+    log_line += "${glove_data.challenge},${glove_data.comfort},";
+
+    widget.storage.write_data(log_line);
   }
 }
 
