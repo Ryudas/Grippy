@@ -102,12 +102,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // activity running average object (frequency denotes how often inactivity
   // should be given out (in seconds), sample rate establishes glove output data rate
   ActivityRunningAvg running_avg = ActivityRunningAvg(7200,5);
+  // average steps threshold during defined time period for inactivity comparison
+  // currently 50 steps
+  int step_threshold = 50;
 
   // distance threshold for warning near previous stress area (25 m)
-   double _distance_threshold = 25.0;
+  double _distance_threshold = 25.0;
 
   // previous received challenge, helps not sending continuous messaging
   bool previous_challenge = false;
+
+
 
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -539,7 +544,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
       // process inactivity given a threshold of steps
-      if(running_avg?.get_inactivity(50)){
+      if(running_avg?.get_inactivity(step_threshold)){
         // do inactivity actions
         _sendMessage("${(GloveProtocol.inactivity_alarm.index)}");
         // debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");

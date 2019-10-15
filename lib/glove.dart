@@ -5,7 +5,7 @@
 
 
 // class packing glove data, including parsing constructor
-/* Parameters 
+/* Parameters
 bool comfort
 bool inact_alarm
 bool stress_alarm
