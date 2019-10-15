@@ -13,6 +13,7 @@ bool challenge
 int timestamp
 int heart_rate
 int steps
+int stress_level
 double acceleration
  */
 class GloveData
@@ -35,9 +36,15 @@ class GloveData
             }
             break;
 
-          case "hr": //heartbeat
+          case "hr": // heartbeat
             {
               this.heart_rate = int.parse(value.substring(2));
+            }
+            break;
+
+          case "sl": // stress level
+            {
+              this.stress_level = int.parse(value.substring(2));
             }
             break;
 
@@ -94,6 +101,7 @@ class GloveData
   int heart_rate =-1;
   int steps =-1;
   double acceleration = -1.0;
+  int stress_level = -1;
 
 }
 

@@ -613,10 +613,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
       // general log
       var date = DateTime.fromMillisecondsSinceEpoch(glove_data.timestamp * 1000);
-      widget.storage.write_data("${date.day}.${date.month}.${date.year},${date.hour}:"
-                                "${date.minute}:${date.second},${glove_data.heart_rate},"
-                                " , ,${glove_data.challenge},${_curr_location.toString()},"
-                                ", , , , ");
+
+      log_data(date, glove_data);
+
 
       // set previous message packet challenge status
       previous_challenge = glove_data.challenge;
@@ -667,6 +666,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   void _start_monitoring_devices()
   {
     _stream_subscriptions[0].resume();
+  }
+
+  void log_data(DateTime date, GloveData glove_data) {
+    // log in file string
+
+    // date / time section
+    String log_line= "${date.day}.${date.month}.${date.year},${date.hour}:"
+                      "${date.minute}:${date.second},";
+
+    log_line += "${glove_data.heart_rate},${glove_data.heart_rate},";
+    widget.storage.write_data("${date.day}.${date.month}.${date.year},${date.hour}:"
+        "${date.minute}:${date.second},${glove_data.heart_rate},"
+        " , ,${glove_data.challenge},${_curr_location.toString()},"
+        ", , , , ");
   }
 }
 
