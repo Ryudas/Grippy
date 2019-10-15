@@ -103,8 +103,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // should be given out (in seconds), sample rate establishes glove output data rate
   ActivityRunningAvg running_avg = ActivityRunningAvg(7200,5);
 
-  // distance threshold for warning near previous stress area (20 m)
-   double _distance_threshold = 30.0;
+  // distance threshold for warning near previous stress area (25 m)
+   double _distance_threshold = 25.0;
 
   // previous received challenge, helps not sending continuous messaging
   bool previous_challenge = false;
@@ -334,7 +334,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Strain Manager'),
+          title: Text('Get a Grip'),
           backgroundColor: Color(0xFF0085AC),
           // in case we have recording, adding a record button
           leading: Visibility(
@@ -472,6 +472,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
      });
+   }).catchError((error) {
+     // call connect again
+     _connect_to_device(address);
    });
  }
 
@@ -511,7 +514,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
    // Setup a list of the paired devices
    FlutterBluetoothSerial?.instance?.getBondedDevices()?.then((List<BluetoothDevice> paired_devices) {
      available_devices += paired_devices;
-     _connect_to_device(available_devices[0].address);
+     try {
+       _connect_to_device(available_devices[0].address);
+     } catch(e){
+       // restart app connection
+       _process_paired_devices();
+     }
    });
 
  }

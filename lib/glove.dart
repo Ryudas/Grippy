@@ -5,6 +5,16 @@
 
 
 // class packing glove data, including parsing constructor
+/* Parameters 
+bool comfort
+bool inact_alarm
+bool stress_alarm
+bool challenge
+int timestamp
+int heart_rate
+int steps
+double acceleration
+ */
 class GloveData
 {
   //default constructor
@@ -18,28 +28,50 @@ class GloveData
       // get first character, the identifier
       // and assign members
       if( value.isNotEmpty) {
-        switch (value[0]) {
-          case "t":
+        switch (value.substring(0, 2)) {
+          case "tm": // timestamp
             {
-              this.timestamp = int.parse(value.substring(1));
+              this.timestamp = int.parse(value.substring(2));
             }
             break;
 
-          case "h":
+          case "hr": //heartbeat
             {
-              this.heart_rate = int.parse(value.substring(1));
+              this.heart_rate = int.parse(value.substring(2));
             }
             break;
 
-          case "s":
+          case "st": //steps
             {
-              this.steps = int.parse(value.substring(1));
+              this.steps = int.parse(value.substring(2));
             }
             break;
 
-          case "c":
+          case "ac": //acceleration modulus
             {
-              this.challenge = ((value.substring(1)) == "1" )? true : false ;
+              this.acceleration = double.parse(value.substring(2));
+            }
+            break;
+
+          case "sa": //stress alarm
+            {
+              this.stress_alarm = ((value.substring(2)) == "1" )? true : false;
+            }
+            break;
+
+          case "ir": //inactivity alarm
+            {
+              this.inact_alarm= ((value.substring(2)) == "1" )? true : false;
+            }
+            break;
+          case "cp": // challenge prompt
+            {
+              this.challenge = ((value.substring(2)) == "1" )? true : false;
+            }
+            break;
+          case "cs": // comfort signal
+            {
+              this.comfort = ((value.substring(2)) == "1" )? true : false;
             }
             break;
 
@@ -51,14 +83,17 @@ class GloveData
 
     });
 
-
   }
 
+  // parameters
+  bool comfort= false;
+  bool inact_alarm= false;
+  bool stress_alarm= false;
+  bool challenge = false;
   int timestamp= -1;
   int heart_rate =-1;
   int steps =-1;
-  bool challenge = false;
-
+  double acceleration = -1.0;
 
 }
 
