@@ -314,6 +314,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
             distance.then( ( double dis_value) {
                 if(dis_value < _distance_threshold){
                   // trigger something
+
                 }
             });
 
@@ -586,12 +587,68 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
         // log event
-        widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
+        //widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
 
         // add marker( high stress) to map
         place_marker("fist_red");
 
       }
+
+      // if pressure level is not 0
+      if(glove_data.stress_level != 0)
+      {
+          switch(glove_data.stress_level)
+          {
+            case 1:
+            {
+              Fluttertoast.showToast(
+                  msg: "Self report of stress level 1",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIos: 5,
+                  backgroundColor: Colors.cyan,
+                  textColor: Colors.white,
+                  fontSize: 16.0
+              );
+
+              place_marker("fist_green");
+            }
+            break;
+
+            case 2:
+            {
+              Fluttertoast.showToast(
+                  msg: "Self report of stress level 2",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIos: 5,
+                  backgroundColor: Colors.cyan,
+                  textColor: Colors.white,
+                  fontSize: 16.0
+              );
+
+              place_marker("fist_yellow");
+            }
+            break;
+
+            case 3:
+            {
+              Fluttertoast.showToast(
+                  msg: "Self report of stress level 3",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIos: 5,
+                  backgroundColor: Colors.cyan,
+                  textColor: Colors.white,
+                  fontSize: 16.0
+              );
+
+              place_marker("fist_red");
+            }
+            break;
+          }
+      }
+
 
       // process challenge if challenge is running(comfort mode),
       // and the previous received was not a challenge
