@@ -107,7 +107,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   int step_threshold = 50;
 
   // distance threshold for warning near previous stress area (25 m)
-  double _distance_threshold = 25.0;
+  int _distance_threshold = 25;
 
   // previous received challenge, helps not sending continuous messaging
   bool previous_challenge = false;
@@ -151,11 +151,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     // Location subscription
     var geolocator = Geolocator();
     // desired accuracy and the minimum distance change
-    // (in meters) before updates are sent to the application - 1m in our case.
-    var location_options = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 1);
+    // (in meters) before updates are sent to the application - the detection range in our case.
+    var location_options = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: _distance_threshold);
     _stream_subscriptions.add(
         geolocator.getPositionStream(location_options).listen((Position event) {
           setState(() {
+
             _loc_values = <String>[event.latitude.toStringAsFixed(3),
               event.longitude.toStringAsFixed(3),
               event.altitude.toStringAsFixed(3),
@@ -211,17 +212,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       });
     });
 
-//    if(_is_discovering){
-//     // _start_discovering_devices();
-//    }
-
-/*
- // Setup a list of the paired devices
-    FlutterBluetoothSerial.instance.getBondedDevices().then((List<BluetoothDevice> paired_devices) {
-        available_devices += paired_devices;
-        _connect_to_device(available_devices[0].address);
-    });
-*/
     _process_paired_devices();
 
     // load saved markers in shared preferences
@@ -298,6 +288,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         icon:  loc_icon ??  BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       );
 
+
       // checking for close distance to close spots
       if(_markers.isNotEmpty)
       {
@@ -312,10 +303,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                                                         marker.position.longitude);
 
             distance.then( ( double dis_value) {
-                if(dis_value < _distance_threshold){
-                  // trigger something
+              if(dis_value <= _distance_threshold)
+              {
+                // trigger something
+                // do high stress actions (index returns enum value)
+                // begin challenge
+                _sendMessage("${(GloveProtocol.stress_alarm.index)}");
+              }
 
-                }
             });
 
           }
@@ -707,7 +702,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // utility function to send location data to glove
   // if no connection exists, does not do anything
-  void send_loc_data(){
+  void send_loc_data()
+  {
     if(_bl_serial_connection.isConnected){
       var loc_msg = """lat${_curr_location.position.latitude},
                     lng${_curr_location.position.latitude}""";
@@ -715,7 +711,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       _sendMessage(loc_msg);
     }
   }
-
 
   void _stop_monitoring_devices()
   {
@@ -727,7 +722,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     _stream_subscriptions[0].resume();
   }
 
-  void log_data(DateTime date, GloveData glove_data) {
+  void log_data(DateTime date, GloveData glove_data)
+  {
     // log in file string
 
     // date / time section
@@ -744,8 +740,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     widget.storage.write_data(log_line);
   }
 
-  // disposes bluetooth connection
-  void dispose_bl_connection(){
+  // disposes of bluetooth connection
+  void dispose_bl_connection()
+  {
 
     if(_bl_serial_connection.isConnected && _bl_serial_connection != null) {
       //  Avoid memory leak (`setState` after dispose) and disconnect
