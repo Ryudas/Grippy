@@ -275,6 +275,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     // are we discovering for bluetooth devices?
+
     if(_is_discovering){
       _start_discovering_devices();
     }
@@ -308,7 +309,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                                                         marker.position.longitude);
 
             distance.then( ( double dis_value) {
-              if(dis_value <= _distance_threshold)
+              // within threshold and not in the same place
+              if(dis_value <= _distance_threshold && dis_value!= 0)
               {
                 // trigger something
                 // do high stress actions (index returns enum value)
@@ -689,7 +691,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   void place_marker(String icon_id) {
     // useless if it is
     if (marker_icons.isEmpty) return;
-
+    bool leave = false;
     // iterate over every map entry
     _markers.forEach((String marker_id, Marker marker) {
       // everything but location
@@ -698,8 +700,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       if (marker_id != "loc") {
           if (marker.position.latitude == _curr_location.position.latitude &&
               marker.position.longitude == _curr_location.position.longitude) {
-
-            return;
+            leave = true;
           }
 
       }
@@ -707,21 +708,22 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
     });
 
-    // add marker to make, using
-    setState(() {
-      debugPrint("${_markers.length}");
-      _markers.addAll({ "${_markers.length}":
-      Marker(markerId: MarkerId("${_markers.length}"),
-        position: _curr_location.position,
-        icon: marker_icons[icon_id],
-      )
+    if(!leave) {
+      // add marker to make, using
+      setState(() {
+        debugPrint("${_markers.length}");
+        _markers.addAll({ "${_markers.length}":
+        Marker(markerId: MarkerId("${_markers.length}"),
+          position: _curr_location.position,
+          icon: marker_icons[icon_id],
+        )
+        });
       });
-    });
 
-    add_marker_prefs(_curr_location.position.latitude,
-        _curr_location.position.longitude,
-        icon_id
-    );
+      add_marker_prefs(_curr_location.position.latitude,
+          _curr_location.position.longitude,
+          icon_id);
+    }
   }
 
   // utility function to send location data to glove
