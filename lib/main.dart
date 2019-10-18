@@ -296,6 +296,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       if(_markers.isNotEmpty)
       {
         // iterate over every map entry
+
+
         _markers.forEach( ( String marker_id, Marker marker) {
           // everything but location
           if (marker_id != "loc")
@@ -684,26 +686,42 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // adds a particular marker to map, depending on stress value (low, medium high)
   // then add it to the shared preferences.
-  void place_marker(String icon_id)
-  {
-      // useless if it is
-      if(marker_icons.isEmpty) return;
+  void place_marker(String icon_id) {
+    // useless if it is
+    if (marker_icons.isEmpty) return;
 
-      // add marker to make, using
-      setState(() {
-        debugPrint("${_markers.length}");
-        _markers.addAll({ "${_markers.length}":
-        Marker( markerId: MarkerId("${_markers.length}"),
-          position: _curr_location.position,
-          icon: marker_icons[icon_id],
-        )
-        });
+    // iterate over every map entry
+    _markers.forEach((String marker_id, Marker marker) {
+      // everything but location
+
+      // dont place a marker if there is one already there
+      if (marker_id != "loc") {
+          if (marker.position.latitude == _curr_location.position.latitude &&
+              marker.position.longitude == _curr_location.position.longitude) {
+
+            return;
+          }
+
+      }
+
+
+    });
+
+    // add marker to make, using
+    setState(() {
+      debugPrint("${_markers.length}");
+      _markers.addAll({ "${_markers.length}":
+      Marker(markerId: MarkerId("${_markers.length}"),
+        position: _curr_location.position,
+        icon: marker_icons[icon_id],
+      )
       });
+    });
 
-      add_marker_prefs(_curr_location.position.latitude,
-          _curr_location.position.longitude,
-          icon_id
-      );
+    add_marker_prefs(_curr_location.position.latitude,
+        _curr_location.position.longitude,
+        icon_id
+    );
   }
 
   // utility function to send location data to glove
