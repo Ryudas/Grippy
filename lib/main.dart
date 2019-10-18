@@ -112,6 +112,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // previous received challenge, helps not sending continuous messaging
   bool previous_challenge = false;
 
+  // previous pressure level (to ignore continuous messages on same level
+  int prev_pressure_level= -1;
+
 
 
   // when map object is created
@@ -590,8 +593,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       }
 
       // if pressure level is not 0
-      if(glove_data.stress_level != 0)
+      if(glove_data.stress_level >= 0 && glove_data.stress_level != prev_pressure_level)
       {
+
+
           switch(glove_data.stress_level)
           {
             case 1:
@@ -647,7 +652,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
       // process challenge if challenge is running(comfort mode),
       // and the previous received was not a challenge
-      if(glove_data.comfort & !previous_challenge){
+      if(glove_data.comfort && !previous_challenge){
         // send data
 
         Fluttertoast.showToast(
@@ -673,6 +678,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
       // set previous message packet challenge status
       previous_challenge = glove_data.comfort;
+      prev_pressure_level = glove_data.stress_level;
 
   }
 
