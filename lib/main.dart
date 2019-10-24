@@ -592,7 +592,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         //widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
 
         // add marker( high stress) to map
-        place_marker("fist_red");
+        //place_marker("fist_red");
 
       }
 
@@ -701,6 +701,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
           if (marker.position.latitude == _curr_location.position.latitude &&
               marker.position.longitude == _curr_location.position.longitude) {
             leave = true;
+
+            if(icon_id == "medal"){
+                marker. =   marker_icons[icon_id];
+            }
           }
 
       }
