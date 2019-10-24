@@ -90,6 +90,28 @@ Future<bool> add_marker_prefs (double lat, double lng, String icon) async
 
 }
 
+
+// replace a marker in shared preferences
+// icon string can be "medal, fist_{red, green, yellow}"
+Future<bool> replace_marker_prefs (double lat, double lng, String marker_id, String replacing_icon) async
+{
+
+  // get shared preferences instance object for our markers
+  SharedPreferences marker_prefs = await SharedPreferences.getInstance();
+  var temp_marker = <String>[];
+  temp_marker.add("${lat}");
+  temp_marker.add("${lng}");
+  temp_marker.add(replacing_icon);
+  // index is still num markers, since theyre zero indexed
+  bool res = await marker_prefs.setStringList(marker_id,temp_marker);
+
+
+  // if failed will have to do again
+  return(res);
+
+}
+
+
 // tries to remove all markers in shared preferences
 void  remove_all_markers_prefs() async
 {

@@ -703,7 +703,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
             leave = true;
 
             if(icon_id == "medal"){
-                marker. =   marker_icons[icon_id];
+                // update icon in app
+                _markers.update(marker_id,
+                                (existingValue) => marker.copyWith(iconParam:  marker_icons[icon_id]));
+
+
+
+                // replace shared preferences marker
+
+                return;
             }
           }
 
@@ -789,6 +797,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       _is_discovering = true;
     });
   }
+
 }
 
 
