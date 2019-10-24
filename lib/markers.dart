@@ -102,7 +102,7 @@ Future<bool> replace_marker_prefs (double lat, double lng, String marker_id, Str
   temp_marker.add("${lat}");
   temp_marker.add("${lng}");
   temp_marker.add(replacing_icon);
-  // index is still num markers, since theyre zero indexed
+  // index is still num markers, since they're zero indexed
   bool res = await marker_prefs.setStringList(marker_id,temp_marker);
 
 
@@ -149,5 +149,7 @@ void remove_marker_prefs(String marker_id) async
     var temp = marker_prefs.getInt("counter");
 
     if (res) await marker_prefs.setInt("counter", temp - 1 );
-  }
+
+
+
 }

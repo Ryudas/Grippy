@@ -710,6 +710,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
                 // replace shared preferences marker
+                replace_marker_prefs(marker.position.latitude,
+                                     marker.position.longitude,
+                                     marker_id,
+                                     "medal");
+
+                setState(() {
+                    _markers = _markers;
+                });
 
                 return;
             }
