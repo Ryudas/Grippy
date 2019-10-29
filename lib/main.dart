@@ -540,60 +540,58 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       // log incoming raw string glove data
       //widget.storage.write_data(data);
       //debugPrint("${messages.last}");
+
+
       messages.removeLast();
 
       // parse glove data into prepared object
       var glove_data = GloveData(data);
-      running_avg.add_data_pt(glove_data.steps);
+
+      if(!glove_data.comfort) {
+        running_avg.add_data_pt(glove_data.steps);
 
 
-      // process inactivity given a threshold of steps
-      if(running_avg?.get_inactivity(step_threshold)){
-        // do inactivity actions
-        _sendMessage("${(GloveProtocol.inactivity_alarm.index)}");
-        // debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");
-        // log event
-        //widget.storage.write_data("${DateTime.now().toUtc()}, Inactivity detected!\n");
+        // process inactivity given a threshold of steps
+        if (running_avg?.get_inactivity(step_threshold)) {
+          // do inactivity actions
+          _sendMessage("${(GloveProtocol.inactivity_alarm.index)}");
+          // debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");
+          // log event
+          //widget.storage.write_data("${DateTime.now().toUtc()}, Inactivity detected!\n");
 
-        // show warning message
-        Fluttertoast.showToast(
-            msg: "You've been quite inactive so far!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIos: 20,
-            backgroundColor: Colors.cyan,
-            textColor: Colors.white,
-            fontSize: 16.0
-        );
-
-      }
-
+          // show warning message
+          Fluttertoast.showToast(
+              msg: "You've been quite inactive so far!",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIos: 20,
+              backgroundColor: Colors.cyan,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+        }
 
 
-      // process stress ( 100 - 130 - heart attack)
-      if( glove_data?.heart_rate < 100){
-        // normal
+        // process stress ( 100 - 130 - heart attack)
+        if (glove_data?.heart_rate < 100) {
+          // normal
 
 
-
-      } else if (glove_data.heart_rate < 120)
-
-
-      {
-        // mid to high
-      } else{
-
-        // high warning!
-        // do high stress actions (index returns enum value)
-        //_sendMessage("${(GloveProtocol.stress_alarm.index)}");
+        } else if (glove_data.heart_rate < 120) {
+          // mid to high
+        } else {
+          // high warning!
+          // do high stress actions (index returns enum value)
+          _sendMessage("${(GloveProtocol.stress_alarm.index)}");
 
 
-        // log event
-        //widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
+          // log event
+          //widget.storage.write_data("${DateTime.now().toUtc()}, High stress detected!\n");
 
-        // add marker( high stress) to map
-        //place_marker("fist_red");
+          // add marker( high stress) to map
+          //place_marker("fist_red");
 
+        }
       }
 
       // if pressure level is not 0
