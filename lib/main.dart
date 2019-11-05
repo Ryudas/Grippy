@@ -128,17 +128,23 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch(state) {
       case AppLifecycleState.resumed:
+        setState(() {
+          _bl_serial_connection = null;
+          // Whether device is connected to serial
+          _is_connected_to_serial = false;
+        });
         _process_paired_devices();
+
       // Handle this case
         break;
       case AppLifecycleState.inactive:
-        dispose_bl_connection();
+        //dispose_bl_connection();
         break;
       case AppLifecycleState.paused:
-        dispose_bl_connection();
+      //  dispose_bl_connection();
         break;
       case AppLifecycleState.suspending:
-        dispose_bl_connection();
+       // dispose_bl_connection();
         break;
     }
   }
@@ -236,7 +242,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     super.dispose();
     WidgetsBinding.instance.removeObserver(this);
 
-    if(_bl_serial_connection.isConnected && _bl_serial_connection != null) {
+    if(_bl_serial_connection != null && _bl_serial_connection.isConnected) {
       //  Avoid memory leak (`setState` after dispose) and disconnect
       _bl_serial_connection?.dispose();
       _bl_serial_connection = null;
@@ -256,7 +262,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     super.deactivate();
     // deactivate connection
 
-    if(_bl_serial_connection.isConnected && _bl_serial_connection != null) {
+    if(_bl_serial_connection != null && _bl_serial_connection.isConnected ) {
       //  Avoid memory leak (`setState` after dispose) and disconnect
       _bl_serial_connection?.dispose();
       _bl_serial_connection = null;
@@ -315,8 +321,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                 // trigger something
                 // do high stress actions (index returns enum value)
                 // begin challenge
-                _sendMessage("${(GloveProtocol.stress_alarm.index)}");
-              }
+                try{
+                  _sendMessage("${(GloveProtocol.stress_alarm.index)}");
+                } catch(e) {
+                  debugPrint("Message send error!");
+                }
+
+            }
 
             });
 
@@ -450,7 +461,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
    // remove leading and trailing spaces
    text = text.trim();
 
-   if (text.isNotEmpty)  {
+   if (_bl_serial_connection != null && text.isNotEmpty)  {
      _bl_serial_connection.output.add(utf8.encode(text + "\r\n"));
    }
 
@@ -541,8 +552,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       //widget.storage.write_data(data);
       //debugPrint("${messages.last}");
 
+      // check message integrity 
+      if( data.startsWith('s')  && data.endsWith('e')){
+          // pop out string termination and start chars
+          data = data.substring(1, data.length - 2 );
+          messages.removeLast();
 
-      messages.removeLast();
+      }else{
+        messages.removeLast();
+        return;
+      }
+
 
       // parse glove data into prepared object
       var glove_data = GloveData(data);
@@ -554,7 +574,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         // process inactivity given a threshold of steps
         if (running_avg?.get_inactivity(step_threshold)) {
           // do inactivity actions
-          _sendMessage("${(GloveProtocol.inactivity_alarm.index)}");
+          try {
+            _sendMessage("${(GloveProtocol.inactivity_alarm.index)}");
+          } catch(e) {
+            debugPrint("Message send error!");
+            
+          }
+
           // debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");
           // log event
           //widget.storage.write_data("${DateTime.now().toUtc()}, Inactivity detected!\n");
@@ -582,7 +608,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         } else {
           // high warning!
           // do high stress actions (index returns enum value)
-          _sendMessage("${(GloveProtocol.stress_alarm.index)}");
+          try{
+            _sendMessage("${(GloveProtocol.stress_alarm.index)}");
+          } catch(e) {
+            debugPrint("Message send error!");
+          }
 
 
           // log event
@@ -748,11 +778,22 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // if no connection exists, does not do anything
   void send_loc_data()
   {
+    if(_bl_serial_connection == null) {
+      return;
+    }
+
     if(_bl_serial_connection.isConnected){
       var loc_msg = """lat${_curr_location.position.latitude},
                     lng${_curr_location.position.latitude}""";
 
-      _sendMessage(loc_msg);
+      try{
+        _sendMessage(loc_msg);
+      } catch(e) {
+        debugPrint("Message send error!");
+        // try again
+        send_loc_data();
+      }
+
     }
   }
 
@@ -788,7 +829,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   void dispose_bl_connection()
   {
 
-    if(_bl_serial_connection.isConnected && _bl_serial_connection != null) {
+    if(_bl_serial_connection != null && _bl_serial_connection.isConnected ) {
       //  Avoid memory leak (`setState` after dispose) and disconnect
       _bl_serial_connection?.dispose();
       _bl_serial_connection = null;
@@ -803,6 +844,23 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       _is_discovering = true;
     });
   }
+  
+  // sends message with persistant catch, with num of tries
+  void send_message_persistent(String message, [int tries = 5 ]){
+    // do not attempt to send 
+    if(tries == 0 )
+      return;
+
+    try{
+      _sendMessage(message);
+    } catch(e) {
+      debugPrint("Message send error!");
+      // try again
+      send_message_persistent(message, tries - 1);
+    }
+    
+  }
+  
 
 }
 

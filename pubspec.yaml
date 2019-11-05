@@ -22,7 +22,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   google_maps_flutter: ^0.5.20+1
   geolocator: ^5.0.1
-  flutter_bluetooth_serial: ^0.2.0
+  flutter_bluetooth_serial: ^0.2.2
   path_provider: ^1.2.0
   shared_preferences: ^0.5.3+4
   fluttertoast: ^3.1.2
