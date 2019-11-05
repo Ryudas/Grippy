@@ -456,16 +456,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
  }
 
   // Sends message through bluetooth connection
-  void _sendMessage(String text)
-  {
-   // remove leading and trailing spaces
-   text = text.trim();
+  void _sendMessage(String text) {
+    // remove leading and trailing spaces
+    text = text.trim();
 
-   if (_bl_serial_connection != null && text.isNotEmpty)  {
-     _bl_serial_connection.output.add(utf8.encode(text + "\r\n"));
-   }
+    if (_bl_serial_connection != null && text.isNotEmpty) {
+      _bl_serial_connection.output.add(utf8.encode(text + "\r\n"));
+    }
+  }
 
- }
+
 
   // Connect to bluetooth device given its address
   void _connect_to_device(String address)
@@ -574,12 +574,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         // process inactivity given a threshold of steps
         if (running_avg?.get_inactivity(step_threshold)) {
           // do inactivity actions
-          try {
-            _sendMessage("${(GloveProtocol.inactivity_alarm.index)}");
-          } catch(e) {
-            debugPrint("Message send error!");
-            
-          }
+
+          send_message_persistent("${(GloveProtocol.inactivity_alarm.index)}");
+
 
           // debugPrint("${GloveProtocol.inactivity_alarm.index.toString()}");
           // log event
@@ -608,11 +605,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         } else {
           // high warning!
           // do high stress actions (index returns enum value)
-          try{
-            _sendMessage("${(GloveProtocol.stress_alarm.index)}");
-          } catch(e) {
-            debugPrint("Message send error!");
-          }
+            send_message_persistent("${(GloveProtocol.stress_alarm.index)}");
+
 
 
           // log event
@@ -786,16 +780,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       var loc_msg = """lat${_curr_location.position.latitude},
                     lng${_curr_location.position.latitude}""";
 
-      try{
-        _sendMessage(loc_msg);
-      } catch(e) {
-        debugPrint("Message send error!");
-        // try again
-        send_loc_data();
-      }
 
+      send_message_persistent(loc_msg);
     }
+
   }
+
 
   void _stop_monitoring_devices()
   {
@@ -845,9 +835,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     });
   }
   
-  // sends message with persistant catch, with num of tries
+  // sends message with persistent catch, with num of tries
   void send_message_persistent(String message, [int tries = 5 ]){
-    // do not attempt to send 
+    // do not attempt to send
     if(tries == 0 )
       return;
 
