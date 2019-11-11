@@ -125,7 +125,7 @@ class ActivityRunningAvg
   // returns true if running avr is low (compared to threshold)
   // in period frequency (depends on steps sampling rate)
   // which is currently 5 seconds
-  bool get_inactivity(int threshold){
+  bool get_inactivity(double threshold){
 
     // if we can give a warning
     if( total_data_pts * 5 < frequency){

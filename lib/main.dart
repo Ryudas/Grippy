@@ -103,8 +103,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // should be given out (in seconds), sample rate establishes glove output data rate
   ActivityRunningAvg running_avg = ActivityRunningAvg(7200,5);
   // average steps threshold during defined time period for inactivity comparison
-  // currently 50 steps
-  int step_threshold = 50;
+  // currently outputs to some 1000 steps over 2 hours -> total steps / 1440 ~ 0.7
+  double step_threshold = .70;
 
   // distance threshold for warning near previous stress area (25 m)
   int _distance_threshold = 25;
@@ -115,6 +115,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // previous pressure level (to ignore continuous messages on same level
   int prev_pressure_level= -1;
 
+
+  // previous steps received, used to calculate step difference
+  int prev_step_count = 0;
   // setting to stop stress alarm near position
   bool can_send_stress = true;
 
@@ -324,7 +327,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                 // do high stress actions (index returns enum value)
                 // begin challenge
 
-                  send_message_persistent("${(GloveProtocol.stress_alarm.index)}");
+                  send_message_persistent("${(GloveProtocol.challenge_detected.index)}");
 
 
             }
@@ -568,11 +571,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       var glove_data = GloveData(data);
 
       if(!glove_data.comfort) {
-        running_avg.add_data_pt(glove_data.steps);
+        // get difference of steps from last sample
+        running_avg.add_data_pt(glove_data.steps - prev_step_count);
 
 
         // process inactivity given a threshold of steps
-        if (running_avg?.get_inactivity(step_threshold)) {
+        if (running_avg.get_inactivity(step_threshold)) {
           // do inactivity actions
 
           send_message_persistent("${(GloveProtocol.inactivity_alarm.index)}");
@@ -708,6 +712,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       // set previous message packet challenge status
       previous_challenge = glove_data.comfort;
       prev_pressure_level = glove_data.stress_level;
+      prev_step_count = glove_data.steps;
 
   }
 
