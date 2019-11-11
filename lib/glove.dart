@@ -118,7 +118,7 @@ class ActivityRunningAvg
   //holds amount of inputs
   static int total_data_pts = 0;
   // holds average activity
-  double running_avg = 0;
+  double total_steps = 0.0;
   int frequency;
   int glove_ODR;
 
@@ -132,7 +132,9 @@ class ActivityRunningAvg
       return(false);
     }else{
       // reset running average
+      double running_avg = total_steps / total_data_pts;
       total_data_pts = 0;
+      total_steps = 0;
       if(running_avg < threshold) {
         return(true);
       }
@@ -147,7 +149,7 @@ class ActivityRunningAvg
     total_data_pts +=1;
 
     // calculate running average
-    running_avg += (steps / total_data_pts);
+    total_steps += (steps);
   }
 
 
