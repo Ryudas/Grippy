@@ -115,6 +115,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // previous pressure level (to ignore continuous messages on same level
   int prev_pressure_level= -1;
 
+  // setting to stop stress alarm near position
+  bool can_send_stress = true;
 
 
   // when map object is created
@@ -321,11 +323,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                 // trigger something
                 // do high stress actions (index returns enum value)
                 // begin challenge
-                try{
-                  _sendMessage("${(GloveProtocol.stress_alarm.index)}");
-                } catch(e) {
-                  debugPrint("Message send error!");
-                }
+
+                  send_message_persistent("${(GloveProtocol.stress_alarm.index)}");
+
 
             }
 
@@ -600,12 +600,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
           // normal
 
 
-        } else if (glove_data.heart_rate < 120) {
+        } else if (glove_data.heart_rate < 130) {
           // mid to high
         } else {
           // high warning!
           // do high stress actions (index returns enum value)
-            send_message_persistent("${(GloveProtocol.stress_alarm.index)}");
+            if( can_send_stress) {
+              send_message_persistent("${(GloveProtocol.stress_alarm.index)}");
+            }
+
 
 
 
