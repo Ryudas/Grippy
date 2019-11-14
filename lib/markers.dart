@@ -24,7 +24,8 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
     SharedPreferences marker_prefs = await SharedPreferences.getInstance();
     // get number of saved markers (zero if none exist)
     var num_markers = (marker_prefs.getInt("counter") ?? 0);
-
+    // list of id's belonging to medals
+    var list_medals = [];
     for(int i = 0; i < num_markers; i++)
     {
          // get each marker saved object and save new marker
@@ -36,9 +37,14 @@ Future<Map<String, Marker>> process_markers(BuildContext context) async
                                            double.parse(marker_list[1])
                                        ),
                                        icon: marker_icons[marker_list[2]],
-                               );                      
+
+                               );
+
+         if(marker_list[2] == "medal") list_medals.add(i);
     }
 
+
+    temp_marker["medals"] = Marker(markerId: MarkerId(list_medals.join(",")) );
 
     return(temp_marker);
 }

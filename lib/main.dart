@@ -234,6 +234,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     // load saved markers in shared preferences
     process_markers(context).then((Map <String, Marker> value) {
                               setState(() {
+                                // remove all ids of the medals
+                                var medals_list = value.remove("medals").markerId.value.split(",");
                                 _markers.addAll(value);
                               });
                             });
@@ -758,12 +760,26 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                                      marker_id,
                                      "medal");
 
+
                 setState(() {
                     _markers = _markers;
                 });
 
+                if(marker.icon == marker_icons["medal"]){
+
+                }
+                var var1 = marker.icon.hashCode;
+                var var2 = marker.icon.toString();
+                bool var3 = (marker.icon == marker_icons["medal"]);
+                var var4 = marker_icons["medal"].toString();
+                var var5 = marker_icons["medal"].hashCode;
+
+
                 return;
             }
+
+
+
           }
 
       }
