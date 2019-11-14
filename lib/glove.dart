@@ -159,13 +159,13 @@ class ActivityRunningAvg
 // class enforcing certain number of stress alarms in a given period, which is
 // in frequency param (in seconds), the update rate of the glove (acts as our
 // triggering clock is in glove odr param, which is currently 5 seconds
-class StressAlarmAvg
+class StressAlarmTmr
 {
 
   // default constructor
   // use frequency parameter (in seconds) to know
   // how often alarm can happen is rung
-  StressAlarmAvg(this.frequency, this.glove_ODR);
+  StressAlarmTmr(this.frequency, this.glove_ODR);
 
   // holds amount of inputs
   static int total_data_pts = 0;

@@ -52,7 +52,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // Current user location marker
   Marker _curr_location;
 
-
   // Stores list of subscriptions to sensor event streams (async data sources)
   List<StreamSubscription<dynamic>> _stream_subscriptions =
   <StreamSubscription<dynamic>>[];
@@ -64,7 +63,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // speed at which the device is traveling in m/s over ground
   // timestamp time at which event was received from device
   List<String> _loc_values;
-
 
   // Creating google map controller object
   GoogleMapController _map_controller;
@@ -105,6 +103,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // average steps threshold during defined time period for inactivity comparison
   // currently outputs to some 1000 steps over 2 hours -> total steps / 1440 ~ 0.7
   double step_threshold = .70;
+
+  // stress timer  object (frequency denotes how often stress alarm
+  // should be given out (in seconds), sample rate establishes glove output data rate
+  // currently outputs to 1 alarm every 1 hour
+  StressAlarmTmr stress_timer= StressAlarmTmr(3600, 5);
 
   // distance threshold for warning near previous stress area (25 m)
   int _distance_threshold = 25;
@@ -599,6 +602,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
           );
         }
 
+        // add data point to stress timer
+        stress_timer.add_data_pt();
+        // if we can give an alarm
+        if(stress_timer.get_alarm_permission()){
+          can_send_stress = true;
+          // if we cannot and it is not the first time
+        } else if(!stress_timer.get_alarm_permission() && can_send_stress == false ){
+          can_send_stress = false;
+        }
 
         // process stress ( 100 - 130 - heart attack)
         if (glove_data?.heart_rate < 100) {
