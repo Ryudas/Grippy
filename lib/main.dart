@@ -46,6 +46,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // Map location markers
    Map<String, Marker> _markers = <String, Marker>{};
 
+   // medals list containing list of medal marker ids
+   List<String> medals_list= <String>[];
+
+
   // Map of possible marker icons
   Map<String, BitmapDescriptor> marker_icons= <String, BitmapDescriptor>{};
 
@@ -235,7 +239,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     process_markers(context).then((Map <String, Marker> value) {
                               setState(() {
                                 // remove all ids of the medals
-                                var medals_list = value.remove("medals").markerId.value.split(",");
+                                medals_list = value.remove("medals").markerId.value.split(",");
                                 _markers.addAll(value);
                               });
                             });
@@ -765,17 +769,24 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                     _markers = _markers;
                 });
 
-                if(marker.icon == marker_icons["medal"]){
-
-                }
-                var var1 = marker.icon.hashCode;
-                var var2 = marker.icon.toString();
-                bool var3 = (marker.icon == marker_icons["medal"]);
-                var var4 = marker_icons["medal"].toString();
-                var var5 = marker_icons["medal"].hashCode;
-
-
                 return;
+
+            // if we're not a medal we can update non medals
+            }else{
+              if (!medals_list.contains(marker_id)){
+                _markers.update(marker_id,
+                        (existingValue) => marker.copyWith(iconParam:  marker_icons[icon_id]));
+
+
+
+                // replace shared preferences marker
+                replace_marker_prefs(marker.position.latitude,
+                    marker.position.longitude,
+                    marker_id,
+                    icon_id);
+              }
+
+              return;
             }
 
 
