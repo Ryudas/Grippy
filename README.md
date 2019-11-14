@@ -1,5 +1,5 @@
-# stress_manager
+# Grippy
 
-Flutter project to help people afflicted with PTSD manage their stress
+Flutter app to help people afflicted with PTSD manage their stress. Works in conjunction with sensor glove.
 
 
