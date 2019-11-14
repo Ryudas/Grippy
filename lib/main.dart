@@ -572,8 +572,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
       if(!glove_data.comfort) {
         // get difference of steps from last sample
-        running_avg.add_data_pt(glove_data.steps - prev_step_count);
-
+        if((glove_data.steps - prev_step_count) != 0) {
+          running_avg.add_data_pt(glove_data.steps - prev_step_count);
+        }
 
         // process inactivity given a threshold of steps
         if (running_avg.get_inactivity(step_threshold)) {

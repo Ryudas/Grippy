@@ -128,7 +128,7 @@ class ActivityRunningAvg
   bool get_inactivity(double threshold){
 
     // if we can give a warning
-    if( total_data_pts * 5 < frequency){
+    if( total_data_pts * glove_ODR < frequency){
       return(false);
     }else{
       // reset running average
@@ -155,6 +155,48 @@ class ActivityRunningAvg
 
 
 }
+
+// class enforcing certain number of stress alarms in a given period, which is
+// in frequency param (in seconds), the update rate of the glove (acts as our
+// triggering clock is in glove odr param, which is currently 5 seconds
+class StressAlarmAvg
+{
+
+  // default constructor
+  // use frequency parameter (in seconds) to know
+  // how often alarm can happen is rung
+  StressAlarmAvg(this.frequency, this.glove_ODR);
+
+  // holds amount of inputs
+  static int total_data_pts = 0;
+  int frequency;
+  int glove_ODR;
+
+  // returns true if we can send stress alarm (1 hour timeout
+  // using glove update rate, which is currently 5 seconds
+  bool get_alarm_permission(){
+
+    // if we can give a warning
+    if( total_data_pts * glove_ODR < frequency){
+      return(false);
+    }else{
+        total_data_pts = 0;
+        return(true);
+    }
+
+  }
+
+  // counts another data point, we call this
+  // whenever we get a new glove data packet
+  void add_data_pt(){
+    //increase data pts
+    total_data_pts +=1;
+  }
+
+
+
+}
+
 
 // enum type (careful with order)
 // order gives the value of enum type
