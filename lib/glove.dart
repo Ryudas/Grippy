@@ -177,6 +177,8 @@ class StressAlarmTmr
   bool get_alarm_permission(){
 
     // if we can give a warning
+    // if first time
+    if( total_data_pts == 1) return(true);
     if( total_data_pts * glove_ODR < frequency){
       return(false);
     }else{

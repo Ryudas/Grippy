@@ -330,7 +330,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
             distance.then( ( double dis_value) {
               // within threshold and not in the same place
-              if(dis_value <= _distance_threshold && dis_value!= 0)
+              if(dis_value <= _distance_threshold )
               {
                 // trigger something
                 // do high stress actions (index returns enum value)
@@ -477,8 +477,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     }
   }
 
-
-
   // Connect to bluetooth device given its address
   void _connect_to_device(String address)
   {
@@ -611,12 +609,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         // add data point to stress timer
         stress_timer.add_data_pt();
         // if we can give an alarm
-        if(stress_timer.get_alarm_permission()){
-          can_send_stress = true;
-          // if we cannot and it is not the first time
-        } else if(!stress_timer.get_alarm_permission() && can_send_stress == false ){
-          can_send_stress = false;
-        }
+        can_send_stress = stress_timer.get_alarm_permission();
 
         // process stress ( 100 - 130 - heart attack)
         if (glove_data?.heart_rate < 100) {
@@ -737,7 +730,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // adds a particular marker to map, depending on stress value (low, medium high)
   // then add it to the shared preferences.
-  void place_marker(String icon_id) {
+  void place_marker(String icon_id)
+  {
     // useless if it is
     if (marker_icons.isEmpty) return;
     bool leave = false;
@@ -776,8 +770,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
               if (!medals_list.contains(marker_id)){
                 _markers.update(marker_id,
                         (existingValue) => marker.copyWith(iconParam:  marker_icons[icon_id]));
-
-
 
                 // replace shared preferences marker
                 replace_marker_prefs(marker.position.latitude,
@@ -833,7 +825,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     }
 
   }
-
 
   void _stop_monitoring_devices()
   {
