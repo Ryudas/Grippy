@@ -127,7 +127,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   int prev_step_count = 0;
   // setting to stop stress alarm near position
   bool can_send_stress = true;
-
+  bool first_stress = true;
 
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -606,8 +606,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
           );
         }
 
-        // add data point to stress timer
-        stress_timer.add_data_pt();
+
         // if we can give an alarm
         can_send_stress = stress_timer.get_alarm_permission();
 
@@ -620,12 +619,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
           // mid to high
         } else {
           // high warning!
+
           // do high stress actions (index returns enum value)
-            if( can_send_stress) {
+            if( can_send_stress || first_stress) {
               send_message_persistent("${(GloveProtocol.stress_alarm.index)}");
             }
 
-
+            if(first_stress == true) first_stress = false;
 
 
           // log event
@@ -726,6 +726,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       prev_pressure_level = glove_data.stress_level;
       prev_step_count = glove_data.steps;
 
+      // add data point to stress timer
+      stress_timer.add_data_pt();
   }
 
   // adds a particular marker to map, depending on stress value (low, medium high)
