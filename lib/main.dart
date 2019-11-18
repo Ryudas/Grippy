@@ -319,10 +319,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       {
         // iterate over every map entry
 
-
+        can_trigger_challenge = false;
         _markers.forEach( ( String marker_id, Marker marker) {
           // everything but location
-          can_trigger_challenge = false;
+
           if (marker_id != "loc")
           {
             var distance = Geolocator().distanceBetween(_curr_location.position.latitude,
@@ -781,12 +781,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                     marker.position.longitude,
                     marker_id,
                     icon_id);
-              }
 
-              // update screen
-              setState(() {
-                _markers = _markers;
-              });
+                // update screen
+                setState(() {
+                  _markers = _markers;
+                });
+
+              }
 
               return;
             }
