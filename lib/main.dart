@@ -763,6 +763,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                                      marker_id,
                                      "medal");
 
+                // new medal
+                medals_list.add("${marker_id}");
+
+
                 // update screen
                 setState(() {
                     _markers = _markers;
@@ -782,10 +786,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                     marker_id,
                     icon_id);
 
+
+
                 // update screen
                 setState(() {
                   _markers = _markers;
                 });
+
 
               }
 
