@@ -364,6 +364,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: Text('Grippy'),
