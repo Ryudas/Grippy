@@ -128,6 +128,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // setting to stop stress alarm near position
   bool can_send_stress = true;
   bool first_stress = true;
+  bool can_trigger_challenge= false;
 
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
@@ -177,7 +178,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     _stream_subscriptions.add(
         geolocator.getPositionStream(location_options).listen((Position event) {
           setState(() {
-
+            can_trigger_challenge = true;
             _loc_values = <String>[event.latitude.toStringAsFixed(3),
               event.longitude.toStringAsFixed(3),
               event.altitude.toStringAsFixed(3),
@@ -314,13 +315,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
       // checking for close distance to close spots
-      if(_markers.isNotEmpty)
+      if(_markers.isNotEmpty && can_trigger_challenge)
       {
         // iterate over every map entry
 
 
         _markers.forEach( ( String marker_id, Marker marker) {
           // everything but location
+          can_trigger_challenge = false;
           if (marker_id != "loc")
           {
             var distance = Geolocator().distanceBetween(_curr_location.position.latitude,
