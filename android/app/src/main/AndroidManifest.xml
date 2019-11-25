@@ -4,8 +4,10 @@
 
     <!-- permission control for Geolocation-->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <!-- permission control for FILE access-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.

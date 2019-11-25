@@ -16,6 +16,7 @@ import 'glove.dart';
 
 // Logging only works for Android
 // Run my app, while creating a DataStorage object for logging
+
 void main(){
   runApp( MaterialApp(
       onGenerateRoute: (RouteSettings settings) {
@@ -339,9 +340,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
                 // begin challenge
 
                   send_message_persistent("${(GloveProtocol.challenge_detected.index)}");
-
-
-            }
+              }
 
             });
 
