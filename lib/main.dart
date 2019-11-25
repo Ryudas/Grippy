@@ -586,6 +586,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
           running_avg.add_data_pt(glove_data.steps - prev_step_count);
         }
 
+        // adds data points regardless of zeroes
+        running_avg.add_data_pt_all();
+
         // process inactivity given a threshold of steps
         if (running_avg.get_inactivity(step_threshold)) {
           // do inactivity actions

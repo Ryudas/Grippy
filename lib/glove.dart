@@ -117,6 +117,7 @@ class ActivityRunningAvg
 
   //holds amount of inputs
   static int total_data_pts = 0;
+  static int total_data_all_pts = 0;
   // holds average activity
   double total_steps = 0.0;
   int frequency;
@@ -127,8 +128,8 @@ class ActivityRunningAvg
   // which is currently 5 seconds
   bool get_inactivity(double threshold){
 
-    // if we can give a warning
-    if( total_data_pts * glove_ODR < frequency){
+    // if we can give a warning (the total data pts forces an alarm every hour)
+    if( total_data_pts * glove_ODR < frequency || total_data_all_pts * glove_ODR < frequency ){
       return(false);
     }else{
       // reset running average
@@ -152,7 +153,11 @@ class ActivityRunningAvg
     total_steps += (steps);
   }
 
-
+  // add data points even if data is 0
+  void add_data_pt_all(){
+    //increase data pts
+    total_data_all_pts +=1;
+  }
 
 }
 
@@ -169,6 +174,7 @@ class StressAlarmTmr
 
   // holds amount of inputs
   static int total_data_pts = 0;
+
   int frequency;
   int glove_ODR;
 
