@@ -867,7 +867,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     // data section
     log_line += "${glove_data.heart_rate},${glove_data.stress_level},";
     log_line += "${glove_data.steps},${glove_data.acceleration},";
-    log_line += "${_curr_location.position.latitude},${_curr_location.position.longitude},";
+    log_line += "${_curr_location?.position?.latitude},${_curr_location?.position?.longitude},";
     log_line += "${glove_data.stress_alarm},${glove_data.inact_alarm},";
     log_line += "${glove_data.challenge},${glove_data.comfort},";
 
