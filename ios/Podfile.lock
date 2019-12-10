@@ -4,7 +4,7 @@ PODS:
     - Flutter
   - fluttertoast (0.0.2):
     - Flutter
-  - geolocator (5.0.1):
+  - geolocator (5.1.5):
     - Flutter
   - google_api_availability (2.0.1):
     - Flutter
@@ -16,7 +16,7 @@ PODS:
   - GoogleMaps/Base (3.1.0)
   - GoogleMaps/Maps (3.1.0):
     - GoogleMaps/Base
-  - location_permissions (2.0.2):
+  - location_permissions (2.0.3):
     - Flutter
   - path_provider (0.0.1):
     - Flutter
@@ -35,7 +35,7 @@ DEPENDENCIES:
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - GoogleMaps
 
 EXTERNAL SOURCES:
@@ -59,17 +59,17 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_bluetooth_serial: a42f785e4f7d2a6390d415cc39da5474ec2fef4f
   fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
-  geolocator: f3dd3b5b1761a15a4da00665774c5a8319e657d6
+  geolocator: 80aba2bb48f8c7dfc5a8b70b9d13fc3edc8399c4
   google_api_availability: 163b30f802e6148c67f092aa4501c90ddd8eec8d
-  google_maps_flutter: 78a52114c898b42ea647919679a4c58b70abe876
+  google_maps_flutter: d0dd62f5a7d39bae61057eb9f52dd778d99c7c6c
   GoogleMaps: 5c13302e6fe6bb6e686b267196586b91cd594225
-  location_permissions: 67cfaff583afbb027a9f9248196f4b79c40f3cdc
-  path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
-  shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
+  location_permissions: 195ff2a1182fa9029ef3f2653156961ee5a1e40b
+  path_provider: fb74bd0465e96b594bb3b5088ee4a4e7bb1f2a9d
+  shared_preferences: 430726339841afefe5142b9c1f50cb6bd7793e01
 
 PODFILE CHECKSUM: 3389836f37640698630b8f0670315d626d5f1469
 
-COCOAPODS: 1.6.2
+COCOAPODS: 1.8.3

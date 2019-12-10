@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show rootBundle, SystemChrome;
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // google maps API
 import 'package:geolocator/geolocator.dart'; // package for geolocation
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // bluetooth serial library
@@ -18,10 +18,11 @@ import 'glove.dart';
 // Run my app, while creating a DataStorage object for logging
 
 void main(){
+  SystemChrome.setEnabledSystemUIOverlays([]);
   runApp( MaterialApp(
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == '/') {
-          return new MaterialPageRoute<Null>(
+          return MaterialPageRoute<Null>(
             settings: settings,
             builder: (_) => MyApp(storage: DataStorage()),
             maintainState: false,
