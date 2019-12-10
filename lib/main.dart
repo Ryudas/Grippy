@@ -324,7 +324,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         _markers.forEach( ( String marker_id, Marker marker) {
           // everything but location
 
-          if (marker_id != "loc")
+          if (marker_id != "loc" && !medals_list.contains(marker_id))
           {
             var distance = Geolocator().distanceBetween(_curr_location.position.latitude,
                                                         _curr_location.position.longitude,
