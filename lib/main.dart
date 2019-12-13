@@ -113,7 +113,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // stress timer  object (frequency denotes how often stress alarm
   // should be given out (in seconds), sample rate establishes glove output data rate
   // currently outputs to 1 alarm every 1 hour
-  StressAlarmTmr stress_timer= StressAlarmTmr(3600, 5);
+  StressAlarmTmr stress_timer= StressAlarmTmr(10, 5);
 
   // distance threshold for warning near previous stress area (25 m)
   int _distance_threshold = 25;
@@ -128,7 +128,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // previous steps received, used to calculate step difference
   int prev_step_count = 0;
   // setting to stop stress alarm near position
-  bool can_send_stress = true;
+  bool can_send_stress = false;
   bool first_stress = true;
   bool can_trigger_challenge= false;
 
@@ -614,7 +614,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
 
         // if we can give an alarm
-        can_send_stress = stress_timer.get_alarm_permission();
+        if (!can_send_stress && !first_stress){
+          can_send_stress = stress_timer.get_alarm_permission();
+        }
+
+
 
         // process stress ( 100 - 130 - heart attack)
         if (glove_data?.heart_rate < 100) {
@@ -629,6 +633,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
           // do high stress actions (index returns enum value)
             if( can_send_stress || first_stress) {
               send_message_persistent("${(GloveProtocol.stress_alarm.index)}");
+              can_send_stress = false;
             }
 
             if(first_stress == true) first_stress = false;
