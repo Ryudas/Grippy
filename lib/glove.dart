@@ -129,12 +129,17 @@ class ActivityRunningAvg
   bool get_inactivity(double threshold){
 
     // if we can give a warning (the total data pts forces an alarm every hour)
-    if( total_data_pts * glove_ODR < frequency || total_data_all_pts * glove_ODR < frequency ){
+    if( total_data_pts * glove_ODR < frequency && total_data_all_pts * glove_ODR < frequency ){
       return(false);
     }else{
       // reset running average
-      double running_avg = total_steps / total_data_pts;
+      double running_avg = 0;
+      if(total_data_pts != 0) {
+        running_avg = total_steps / total_data_pts;
+      }
+
       total_data_pts = 0;
+      total_data_all_pts = 0;
       total_steps = 0;
       if(running_avg < threshold) {
         return(true);
@@ -183,7 +188,7 @@ class StressAlarmTmr
   bool get_alarm_permission(){
 
     // if we can give a warning
-    if( total_data_pts * glove_ODR < frequency){
+    if( total_data_pts * glove_ODR <= frequency){
       return(false);
     }else{
         total_data_pts = 0;

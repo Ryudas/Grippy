@@ -105,7 +105,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // activity running average object (frequency denotes how often inactivity
   // should be given out (in seconds), sample rate establishes glove output data rate
-  ActivityRunningAvg running_avg = ActivityRunningAvg(7200,5);
+  ActivityRunningAvg running_avg = ActivityRunningAvg(15,5);
   // average steps threshold during defined time period for inactivity comparison
   // currently outputs to some 1000 steps over 2 hours -> total steps / 1440 ~ 0.7
   double step_threshold = .70;
@@ -113,7 +113,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   // stress timer  object (frequency denotes how often stress alarm
   // should be given out (in seconds), sample rate establishes glove output data rate
   // currently outputs to 1 alarm every 1 hour
-  StressAlarmTmr stress_timer= StressAlarmTmr(10, 5);
+  StressAlarmTmr stress_timer= StressAlarmTmr(3600, 5);
 
   // distance threshold for warning near previous stress area (25 m)
   int _distance_threshold = 25;
@@ -131,7 +131,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   bool can_send_stress = false;
   bool first_stress = true;
   bool can_trigger_challenge= false;
-
+  bool first_message = true;
   // when map object is created
   void _onMapCreated(GoogleMapController controller) {
     _map_controller = controller;
@@ -565,6 +565,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       //widget.storage.write_data(data);
       //debugPrint("${messages.last}");
 
+
       // check message integrity 
       if( data.startsWith('s')  && data.endsWith('e')){
           // pop out string termination and start chars
@@ -580,9 +581,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       // parse glove data into prepared object
       var glove_data = GloveData(data);
 
+      if (first_message){
+        first_message = false;
+        prev_step_count = glove_data.steps;
+      }
+
       if(!glove_data.comfort) {
         // get difference of steps from last sample
         if((glove_data.steps - prev_step_count) != 0) {
+          var lala = glove_data.steps - prev_step_count;
           running_avg.add_data_pt(glove_data.steps - prev_step_count);
         }
 
