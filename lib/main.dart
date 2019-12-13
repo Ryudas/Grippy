@@ -105,7 +105,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
 
   // activity running average object (frequency denotes how often inactivity
   // should be given out (in seconds), sample rate establishes glove output data rate
-  ActivityRunningAvg running_avg = ActivityRunningAvg(15,5);
+  ActivityRunningAvg running_avg = ActivityRunningAvg(7200,5);
   // average steps threshold during defined time period for inactivity comparison
   // currently outputs to some 1000 steps over 2 hours -> total steps / 1440 ~ 0.7
   double step_threshold = .70;
