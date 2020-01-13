@@ -584,6 +584,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       if (first_message){
         first_message = false;
         prev_step_count = glove_data.steps;
+
+        Fluttertoast.showToast(
+            msg: "Hello, it feels like a new day!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIos: 20,
+            backgroundColor: Colors.cyan,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+
       }
 
       if(!glove_data.comfort) {
