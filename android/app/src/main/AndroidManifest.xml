@@ -21,7 +21,7 @@
 
         <!-- Google Maps API key -->
         <meta-data android:name="com.google.android.geo.API_KEY"
-                   android:value="***REMOVED***"/>
+                   android:value="FILL_ME_IN"/>
 
         <activity
             android:name=".MainActivity"
