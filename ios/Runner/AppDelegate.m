@@ -11,7 +11,7 @@
 
     
     // Adding Google maps API key
-    [GMSServices provideAPIKey: @"***REMOVED***"];
+    [GMSServices provideAPIKey: @"FILL_ME_IN"];
     
     //show status bar again
     UIApplication.sharedApplication.statusBarHidden = false;
